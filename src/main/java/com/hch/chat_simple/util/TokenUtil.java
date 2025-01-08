@@ -3,11 +3,13 @@ package com.hch.chat_simple.util;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.hch.chat_simple.pojo.dto.TokenInfoDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,5 +43,15 @@ public class TokenUtil {
             log.error("token verfier failed", e);
             return null;
         }
+    }
+
+    public static TokenInfoDTO parseTokenInfo(String token) {
+        DecodedJWT decodeJwt = verigyToken(token);
+        if (decodeJwt != null) {
+            String subject = decodeJwt.getSubject();
+            return JSON.parseObject(subject, TokenInfoDTO.class);
+        }
+        return null;
+
     }
 }
