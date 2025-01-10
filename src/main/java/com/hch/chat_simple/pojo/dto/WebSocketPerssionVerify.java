@@ -12,4 +12,10 @@ public class WebSocketPerssionVerify {
     @Schema(name = "用户id")
     private Long userId;
 
+    @Schema(name =  "登录名")
+    private String username;
+
+    @Schema(name = "用户名")
+    private String realName;
+
 }

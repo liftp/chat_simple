@@ -23,6 +23,10 @@ pagehelper:
   supportMethodsArguments: true
   params: count=countSql
 
+# ws:
+#   netty:
+#     path: /chat
+
 server: 
   port: 9001
 chat:
