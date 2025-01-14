@@ -8,20 +8,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(name = "SingleChatMsgDTO", description="单聊消息内容")
-public class SingleChatMsgDTO {
+@Schema(name = "ChatMsgDTO", description="单聊消息内容")
+public class ChatMsgDTO {
     
     @Schema(description = "发送人")
-    private Long from;
+    private Long sendUserId;
 
     @Schema(description = "接收人")
-    private Long to;
+    private Long receiveUserId;
 
     @Schema(description = "消息内容")
-    private String msg;
+    private String content;
+
+    @Schema(description = "群聊id")
+    private Long groupId;
 
     @Schema(description = "服务器时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime serverDate;
+    private LocalDateTime createdAt;
 
 }

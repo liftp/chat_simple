@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 import com.hch.chat_simple.handler.PermisionWsHandler;
-import com.hch.chat_simple.handler.WebSocketSingleChatHandler;
+import com.hch.chat_simple.handler.WebSocketChatHandler;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -38,7 +38,7 @@ public class ChatComponentConfig {
     @Autowired
     private PermisionWsHandler permisionWsHandler;
     @Autowired
-    private WebSocketSingleChatHandler webSocketSingleChatHandler;
+    private WebSocketChatHandler webSocketSingleChatHandler;
 
     private EventLoopGroup bossGroup;
 

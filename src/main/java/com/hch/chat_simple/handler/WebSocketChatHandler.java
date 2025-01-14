@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.hch.chat_simple.config.NettyGroup;
-import com.hch.chat_simple.pojo.dto.SingleChatMsgDTO;
+import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
 import com.hch.chat_simple.pojo.dto.TokenInfoDTO;
 import com.hch.chat_simple.pojo.dto.WebSocketPerssionVerify;
 import com.hch.chat_simple.util.Constant;
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @Sharable
-public class WebSocketSingleChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
+public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSocketFrame> {
 
     // 暂时用Map管理channel，后续使用外部缓存处理
     static final Map<Long, ChannelId> channelMap = NettyGroup.getUserMapChannel();
@@ -41,11 +41,11 @@ public class WebSocketSingleChatHandler extends SimpleChannelInboundHandler<Text
 
         log.info("server receive msg:{}", msg.text());
         // msg是json结构，需要提取发送人
-        SingleChatMsgDTO msgObj = JSON.parseObject(msg.text(), SingleChatMsgDTO.class);
-        msgObj.setServerDate(LocalDateTime.now());
+        ChatMsgDTO msgObj = JSON.parseObject(msg.text(), ChatMsgDTO.class);
+        msgObj.setCreatedAt(LocalDateTime.now());
         // TODO 根据发送人查看是否在线
         // 在线，直接发送
-        channelMap.computeIfPresent(msgObj.getTo(), (k, v) -> {
+        channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
             channelGroup.find(v).writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msgObj)));
             return v;
         });
