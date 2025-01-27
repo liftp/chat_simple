@@ -62,6 +62,12 @@ public class UserOpController {
         return Payload.of(TokenUtil.createToken(token), StatusCodeEnum.SUCCESS);
     }
 
+    public static void main(String[] args) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String pwd = passwordEncoder.encode("123456");
+        System.out.println(pwd);
+    }
+
     @PostMapping("/userInfo")
     @Operation(summary = "用户信息获取")
     public Payload<UserVO> userInfo() {

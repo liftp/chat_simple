@@ -10,6 +10,12 @@ import lombok.Data;
 @Data
 @Schema(name = "ChatMsgDTO", description="单聊消息内容")
 public class ChatMsgDTO {
+
+    /**
+     * @link MsgTypeEnum
+     */
+    @Schema(description = "消息类型")
+    private Integer msgType;
     
     @Schema(description = "发送人")
     private Long sendUserId;

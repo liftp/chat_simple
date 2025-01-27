@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.hch.chat_simple.config.NettyGroup;
+import com.hch.chat_simple.enums.MsgTypeEnum;
 import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
 import com.hch.chat_simple.pojo.dto.TokenInfoDTO;
 import com.hch.chat_simple.pojo.dto.WebSocketPerssionVerify;
@@ -45,10 +46,12 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
         msgObj.setCreatedAt(LocalDateTime.now());
         // TODO 根据发送人查看是否在线
         // 在线，直接发送
-        channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
-            channelGroup.find(v).writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msgObj)));
-            return v;
-        });
+        if (MsgTypeEnum.SEND_MSG.getType().equals(msgObj.getMsgType()) && msgObj.getReceiveUserId() != null) {
+            channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
+                channelGroup.find(v).writeAndFlush(new TextWebSocketFrame(msg.text()));
+                return v;
+            });
+        }
         // TODO 离线，存储数据库，接收人上线拉取
     }
 
