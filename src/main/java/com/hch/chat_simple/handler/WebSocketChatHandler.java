@@ -68,7 +68,7 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
             WebSocketPerssionVerify verify = ctx.channel().attr(key).get();
             if (verify != null) {
                 String token = verify.getToken();
-                if (StringUtils.isNotBlank(token)) {
+                if (StringUtils.isBlank(token)) {
                     // todo 用户未登录消息发送
                     return;
                 }
@@ -91,6 +91,7 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
                     log.info("用户{}, channel id:{}, 加入", username, channel.id().asLongText());
                     // 加入channel
                     channelMap.put(userId, channel.id());
+                    channelGroup.add(channel);
                 }
                 // TODO 登录后，推送未读消息
             } else {
