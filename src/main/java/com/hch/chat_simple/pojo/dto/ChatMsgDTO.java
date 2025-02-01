@@ -33,4 +33,7 @@ public class ChatMsgDTO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
+    @Schema(description = "时间戳字符串")
+    private String dateTime;
+
 }

@@ -40,6 +40,9 @@ public class ChatMsgPO {
     @Schema(description = "群聊id")
     private Long groupId;
 
+    @Schema(description = "消息发送状态 0:失败 1:成功")
+    private Integer status;
+
     @Schema(description = "删除标记：0-未删除，1-已删除")
     @TableLogic
     private String dr;

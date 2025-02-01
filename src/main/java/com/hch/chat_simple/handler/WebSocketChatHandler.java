@@ -1,6 +1,7 @@
 package com.hch.chat_simple.handler;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,6 +22,8 @@ import com.hch.chat_simple.util.Constant;
 import com.hch.chat_simple.util.TokenUtil;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -59,23 +62,30 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
         if (MsgTypeEnum.SEND_MSG.getType().equals(msgObj.getMsgType()) && msgObj.getReceiveUserId() != null) {
             WebSocketPerssionVerify  verify = getUserInfo(ctx);
             msgObj.setSendUserId(verify.getUserId());
-            msgObj.setCreatedAt(LocalDateTime.now());
+            LocalDateTime now = LocalDateTime.now();
+            msgObj.setCreatedAt(now);
+            msgObj.setDateTime(now.toEpochSecond(ZoneOffset.ofHours(8)) + "");
             // 在线直接发送
             channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
-                channelGroup.find(v).writeAndFlush(new TextWebSocketFrame(msg.text()));
+                ChannelFuture sendFuture = channelGroup.find(v).writeAndFlush(new TextWebSocketFrame(msg.text()));
+                sendFuture.addListener((ChannelFutureListener) future -> {
+                    
+                    // 异步存储消息
+                    Runnable asynSaveMsg = () -> {
+                        ChatMsgPO chatMsg = BeanConvert.convertSingle(msgObj, ChatMsgPO.class);
+                        chatMsg.setCreatorId(verify.getUserId());
+                        chatMsg.setCreatorBy(verify.getUsername());
+                        chatMsg.setGroupType(0);
+                        chatMsg.setStatus(future.isSuccess() ? Constant.MSG_SEND_SUCCESSED : Constant.MSG_SEND_FAILED);
+                        chatMsg.setMsgType(MsgTypeEnum.SEND_MSG.getType());
+                        iChatMsgService.save(chatMsg);
+                    };
+                    EXECUTOR_FIXED.submit(asynSaveMsg);
+                });
                 return v;
             });
 
-            // 异步存储消息
-            Runnable asynSaveMsg = () -> {
-                ChatMsgPO chatMsg = BeanConvert.convertSingle(msgObj, ChatMsgPO.class);
-                chatMsg.setCreatorId(verify.getUserId());
-                chatMsg.setCreatorBy(verify.getUsername());
-                chatMsg.setGroupType(0);
-                chatMsg.setMsgType(MsgTypeEnum.SEND_MSG.getType());
-                iChatMsgService.save(chatMsg);
-            };
-            EXECUTOR_FIXED.submit(asynSaveMsg);
+            
             
         }
         // TODO 离线，存储数据库，接收人上线拉取
@@ -119,7 +129,6 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
                     channelMap.put(userId, channel.id());
                     channelGroup.add(channel);
                 }
-                // TODO 登录后，推送未读消息
             } else {
                 // TODO 发送未登录消息
                 return;
