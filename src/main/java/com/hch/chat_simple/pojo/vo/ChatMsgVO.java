@@ -1,23 +1,20 @@
-package com.hch.chat_simple.pojo.po;
+package com.hch.chat_simple.pojo.vo;
 
 import java.time.LocalDateTime;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@TableName("chat_msg")
-@Schema(name = "ChatMsgPO", description="聊天消息内容")
-public class ChatMsgPO {
+@Schema(name = "ChatMsgVO", description="聊天消息内容")
+public class ChatMsgVO {
 
     @Schema(description = "id")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Long msgId;
     /**
      * @link MsgTypeEnum
      */
@@ -43,25 +40,16 @@ public class ChatMsgPO {
     private Integer status;
 
     @Schema(description = "删除标记：0-未删除，1-已删除")
-    @TableLogic
     private String dr;
 
     @Schema(description = "创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
-
-    @Schema(description = "创建人")
-    private String creatorBy;
-
-    @Schema(description = "修改人id")
-    private Long modifierId;
-
-    @Schema(description = "修改人姓名")
-    private String modifierBy;
-
-    @Schema(description = "修改时间")
-    private LocalDateTime updatedAt;
 
     @Schema(description = "创建人id")
     private Long creatorId;
+
+    @Schema(description = "根据创建时间生成的时间戳")
+    private String dateTime;
 
 }

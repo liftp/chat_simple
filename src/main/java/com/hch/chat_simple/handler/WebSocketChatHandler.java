@@ -1,6 +1,7 @@
 package com.hch.chat_simple.handler;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -64,7 +65,7 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
             msgObj.setSendUserId(verify.getUserId());
             LocalDateTime now = LocalDateTime.now();
             msgObj.setCreatedAt(now);
-            msgObj.setDateTime(now.toEpochSecond(ZoneOffset.ofHours(8)) + "");
+            msgObj.setDateTime(now.atZone(ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli() + "");
             // 在线直接发送
             channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
                 ChannelFuture sendFuture = channelGroup.find(v).writeAndFlush(new TextWebSocketFrame(msg.text()));
