@@ -2,6 +2,8 @@ package com.hch.chat_simple.handler;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -12,6 +14,9 @@ import com.hch.chat_simple.enums.MsgTypeEnum;
 import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
 import com.hch.chat_simple.pojo.dto.TokenInfoDTO;
 import com.hch.chat_simple.pojo.dto.WebSocketPerssionVerify;
+import com.hch.chat_simple.pojo.po.ChatMsgPO;
+import com.hch.chat_simple.service.IChatMsgService;
+import com.hch.chat_simple.util.BeanConvert;
 import com.hch.chat_simple.util.Constant;
 import com.hch.chat_simple.util.TokenUtil;
 
@@ -26,6 +31,7 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.AttributeKey;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -36,6 +42,10 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
     // 暂时用Map管理channel，后续使用外部缓存处理
     static final Map<Long, ChannelId> channelMap = NettyGroup.getUserMapChannel();
     static final ChannelGroup channelGroup = NettyGroup.getChannelGroup();
+    static final ExecutorService EXECUTOR_FIXED = Executors.newFixedThreadPool(16);
+
+    @Resource
+    private IChatMsgService iChatMsgService;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
@@ -43,14 +53,30 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
         log.info("server receive msg:{}", msg.text());
         // msg是json结构，需要提取发送人
         ChatMsgDTO msgObj = JSON.parseObject(msg.text(), ChatMsgDTO.class);
-        msgObj.setCreatedAt(LocalDateTime.now());
+        
         // TODO 根据发送人查看是否在线
         // 在线，直接发送
         if (MsgTypeEnum.SEND_MSG.getType().equals(msgObj.getMsgType()) && msgObj.getReceiveUserId() != null) {
+            WebSocketPerssionVerify  verify = getUserInfo(ctx);
+            msgObj.setSendUserId(verify.getUserId());
+            msgObj.setCreatedAt(LocalDateTime.now());
+            // 在线直接发送
             channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
                 channelGroup.find(v).writeAndFlush(new TextWebSocketFrame(msg.text()));
                 return v;
             });
+
+            // 异步存储消息
+            Runnable asynSaveMsg = () -> {
+                ChatMsgPO chatMsg = BeanConvert.convertSingle(msgObj, ChatMsgPO.class);
+                chatMsg.setCreatorId(verify.getUserId());
+                chatMsg.setCreatorBy(verify.getUsername());
+                chatMsg.setGroupType(0);
+                chatMsg.setMsgType(MsgTypeEnum.SEND_MSG.getType());
+                iChatMsgService.save(chatMsg);
+            };
+            EXECUTOR_FIXED.submit(asynSaveMsg);
+            
         }
         // TODO 离线，存储数据库，接收人上线拉取
     }
@@ -113,7 +139,11 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
         Long userId = getUserId(ctx);
         // 缓存移除
         if (userId != null) {
-            channelMap.remove(userId);
+            ChannelId channelId = channelMap.remove(userId);
+            Channel ch = channelGroup.find(channelId);
+            if (ch != null) {
+                channelGroup.remove(ch);
+            }
         }
     }
 
