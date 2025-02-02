@@ -79,6 +79,7 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
                         chatMsg.setGroupType(0);
                         chatMsg.setStatus(future.isSuccess() ? Constant.MSG_SEND_SUCCESSED : Constant.MSG_SEND_FAILED);
                         chatMsg.setMsgType(MsgTypeEnum.SEND_MSG.getType());
+                        chatMsg.setDr(Constant.NOT_DELETE);
                         iChatMsgService.save(chatMsg);
                     };
                     EXECUTOR_FIXED.submit(asynSaveMsg);

@@ -44,7 +44,7 @@ public class FriendRelationshipPO implements Serializable {
 
     @Schema(description = "删除标记：0-未删除，1-已删除")
     @TableLogic
-    private String dr;
+    private Integer dr;
 
     @Schema(description = "创建时间")
     private LocalDateTime createdAt;
