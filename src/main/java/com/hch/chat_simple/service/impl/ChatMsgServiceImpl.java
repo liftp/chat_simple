@@ -39,7 +39,7 @@ public class ChatMsgServiceImpl extends ServiceImpl<ChatMsgMapper, ChatMsgPO> im
             .eq(ChatMsgPO::getReceiveUserId, ContextUtil.getUserId())
             .eq(ChatMsgPO::getStatus, Constant.MSG_SEND_FAILED);
         List<ChatMsgPO> notReadMsg = list(query);
-        // 拉取后修改状态，不用重复拉取
+        // 拉取后修改状态，不会重复拉取
         List<ChatMsgPO> updateList = notReadMsg.stream().map(e -> {
             ChatMsgPO updatePO = new ChatMsgPO();
             updatePO.setId(e.getId());
@@ -51,7 +51,7 @@ public class ChatMsgServiceImpl extends ServiceImpl<ChatMsgMapper, ChatMsgPO> im
             (src, trg) -> {
                 trg.setMsgId(src.getId());
                 if (src.getCreatedAt() != null) {
-                    String dateTime = src.getCreatedAt().atZone(ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli() + "";
+                    String dateTime = src.getCreatedAt().atZone(ZoneId.of(Constant.ZONED_SHANGHAI)).toInstant().toEpochMilli() + "";
                     // log.info("dateTime:{}", dateTime);
                     trg.setDateTime(dateTime);
                 }

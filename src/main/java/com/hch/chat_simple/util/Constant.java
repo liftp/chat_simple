@@ -13,4 +13,6 @@ public class Constant {
     // 是否删除
     public static final Integer NOT_DELETE = 0;
     public static final Integer DELETED = 1;
+
+    public static final String ZONED_SHANGHAI = "Asia/Shanghai";
 }

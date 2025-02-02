@@ -65,7 +65,7 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
             msgObj.setSendUserId(verify.getUserId());
             LocalDateTime now = LocalDateTime.now();
             msgObj.setCreatedAt(now);
-            msgObj.setDateTime(now.atZone(ZoneId.of("Asia/Shanghai")).toInstant().toEpochMilli() + "");
+            msgObj.setDateTime(now.atZone(ZoneId.of(Constant.ZONED_SHANGHAI)).toInstant().toEpochMilli() + "");
             // 在线直接发送
             channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
                 ChannelFuture sendFuture = channelGroup.find(v).writeAndFlush(new TextWebSocketFrame(msg.text()));
