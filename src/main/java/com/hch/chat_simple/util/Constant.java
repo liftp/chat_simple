@@ -15,4 +15,8 @@ public class Constant {
     public static final Integer DELETED = 1;
 
     public static final String ZONED_SHANGHAI = "Asia/Shanghai";
+
+    // 聊天类型
+    public static final Integer SINGLE_CHAT = 1;
+    public static final Integer MUILT_CHAT = 2;
 }

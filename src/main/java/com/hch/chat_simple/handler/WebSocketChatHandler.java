@@ -66,26 +66,30 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
             LocalDateTime now = LocalDateTime.now();
             msgObj.setCreatedAt(now);
             msgObj.setDateTime(now.atZone(ZoneId.of(Constant.ZONED_SHANGHAI)).toInstant().toEpochMilli() + "");
-            // 在线直接发送
-            channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
-                ChannelFuture sendFuture = channelGroup.find(v).writeAndFlush(new TextWebSocketFrame(msg.text()));
-                sendFuture.addListener((ChannelFutureListener) future -> {
-                    
-                    // 异步存储消息
-                    Runnable asynSaveMsg = () -> {
-                        ChatMsgPO chatMsg = BeanConvert.convertSingle(msgObj, ChatMsgPO.class);
-                        chatMsg.setCreatorId(verify.getUserId());
-                        chatMsg.setCreatorBy(verify.getUsername());
-                        chatMsg.setGroupType(0);
-                        chatMsg.setStatus(future.isSuccess() ? Constant.MSG_SEND_SUCCESSED : Constant.MSG_SEND_FAILED);
-                        chatMsg.setMsgType(MsgTypeEnum.SEND_MSG.getType());
-                        chatMsg.setDr(Constant.NOT_DELETE);
-                        iChatMsgService.save(chatMsg);
-                    };
-                    EXECUTOR_FIXED.submit(asynSaveMsg);
+            if (Constant.SINGLE_CHAT.equals(msgObj.getChatType())) {
+                // 单聊：在线直接发送
+                channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
+                    ChannelFuture sendFuture = channelGroup.find(v).writeAndFlush(new TextWebSocketFrame(msg.text()));
+                    sendFuture.addListener((ChannelFutureListener) future -> {
+                        
+                        // 异步存储消息
+                        Runnable asynSaveMsg = () -> {
+                            ChatMsgPO chatMsg = BeanConvert.convertSingle(msgObj, ChatMsgPO.class);
+                            chatMsg.setCreatorId(verify.getUserId());
+                            chatMsg.setCreatorBy(verify.getUsername());
+                            chatMsg.setGroupType(0);
+                            chatMsg.setStatus(future.isSuccess() ? Constant.MSG_SEND_SUCCESSED : Constant.MSG_SEND_FAILED);
+                            chatMsg.setMsgType(MsgTypeEnum.SEND_MSG.getType());
+                            chatMsg.setDr(Constant.NOT_DELETE);
+                            iChatMsgService.save(chatMsg);
+                        };
+                        EXECUTOR_FIXED.submit(asynSaveMsg);
+                    });
+                    return v;
                 });
-                return v;
-            });
+            } else if ((Constant.MUILT_CHAT.equals(msgObj.getChatType()))) {
+                // 群聊消息推送所有实例，进行广播
+            }
 
             
             

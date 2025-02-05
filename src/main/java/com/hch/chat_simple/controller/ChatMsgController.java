@@ -8,6 +8,7 @@ import com.hch.chat_simple.service.IChatMsgService;
 import com.hch.chat_simple.util.Payload;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 
 import java.util.List;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  */
 @RestController
 @RequestMapping("/chatMsg")
+@Tag(name = "聊天消息")
 public class ChatMsgController {
 
     @Resource

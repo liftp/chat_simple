@@ -16,6 +16,9 @@ public class ChatMsgDTO {
      */
     @Schema(description = "消息类型")
     private Integer msgType;
+
+    @Schema(description = "聊天类型 1:单聊 2:群聊")
+    private Integer chatType;
     
     @Schema(description = "发送人")
     private Long sendUserId;
