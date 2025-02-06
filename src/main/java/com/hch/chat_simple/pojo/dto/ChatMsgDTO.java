@@ -3,6 +3,7 @@ package com.hch.chat_simple.pojo.dto;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hch.chat_simple.pojo.vo.UserVO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -38,5 +39,14 @@ public class ChatMsgDTO {
 
     @Schema(description = "时间戳字符串")
     private String dateTime;
+
+    // @Schema(description = "发送人信息")
+    // private UserVO sendUser;
+
+    @Schema(description = "消息id,群聊使用")
+    private Long msgId;
+
+    @Schema(description = "好友id,关联前端的好友列表数据,单聊为单聊用户ID,群聊为群组id")
+    private Long friendId;
 
 }

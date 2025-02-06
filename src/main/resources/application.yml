@@ -1,14 +1,26 @@
 spring:
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      # password: your-password # 如果有密码
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+        shutdown-timeout: 100ms
   application:
     name: chat_simple
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/chat?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true
     username: root
-    password: root
+    password: 123456
   mvc:
     pathmatch:
-      matching-strategy: ant_path_matcher
+      matching-strategy: ANT_PATH_MATCHER
 mybatis-plus:
   global-config:
     db-config:
@@ -24,7 +36,33 @@ pagehelper:
   reasonable: true
   supportMethodsArguments: true
   params: count=countSql
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: async-producer-group
+  consumer:
+    group: async-consumer-group
+mq:
+  topic:
+    chat: muilt_chat
 
+  
+redisson:
+  config: 
+    singleServerConfig:
+      idleConnectionTimeout: 10000
+      connectTimeout: 10000
+      timeout: 3000
+      retryAttempts: 3
+      retryInterval: 1500
+      # password: ${spring.data.redis.password}
+      subscriptionsPerConnection: 5
+      clientName: ${spring.application.name}
+      address: "redis://${spring.redis.data.host}:${spring.data.redis.port}"
+      database: ${spring.redis.database}
+      connectionPoolSize: 64      # 连接池大小
+      connectionMinimumIdleSize: 24 # 最小空闲连接数
+      subscriptionConnectionPoolSize: 50
 # ws:
 #   netty:
 #     path: /chat

@@ -8,18 +8,23 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
 import com.hch.chat_simple.config.NettyGroup;
 import com.hch.chat_simple.enums.MsgTypeEnum;
+import com.hch.chat_simple.mq.AsyncProducerMuiltChat;
 import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
 import com.hch.chat_simple.pojo.dto.TokenInfoDTO;
 import com.hch.chat_simple.pojo.dto.WebSocketPerssionVerify;
 import com.hch.chat_simple.pojo.po.ChatMsgPO;
+import com.hch.chat_simple.pojo.vo.UserVO;
 import com.hch.chat_simple.service.IChatMsgService;
 import com.hch.chat_simple.util.BeanConvert;
 import com.hch.chat_simple.util.Constant;
+import com.hch.chat_simple.util.SnowflakeIdGen;
 import com.hch.chat_simple.util.TokenUtil;
 
 import io.netty.channel.Channel;
@@ -48,8 +53,17 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
     static final ChannelGroup channelGroup = NettyGroup.getChannelGroup();
     static final ExecutorService EXECUTOR_FIXED = Executors.newFixedThreadPool(16);
 
+    @Value("${mq.topic.chat}")
+    private String chatTopic;
+
     @Resource
     private IChatMsgService iChatMsgService;
+
+    @Resource
+    private SnowflakeIdGen snowflakeIdGen;
+
+    @Autowired
+    private AsyncProducerMuiltChat asyncProducerMuiltChat;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
@@ -66,36 +80,45 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
             LocalDateTime now = LocalDateTime.now();
             msgObj.setCreatedAt(now);
             msgObj.setDateTime(now.atZone(ZoneId.of(Constant.ZONED_SHANGHAI)).toInstant().toEpochMilli() + "");
+            // 先存储消息，然后拿到msgId
+            ChatMsgPO chatMsg = BeanConvert.convertSingle(msgObj, ChatMsgPO.class);
+            chatMsg.setCreatorId(verify.getUserId());
+            chatMsg.setCreatorBy(verify.getUsername());
+            chatMsg.setGroupType(0);
+            chatMsg.setStatus(Constant.MSG_SEND_FAILED); // 默认发送失败，成功后异步修改状态
+            chatMsg.setMsgType(MsgTypeEnum.SEND_MSG.getType());
+            chatMsg.setDr(Constant.NOT_DELETE);
+            iChatMsgService.save(chatMsg);
+
             if (Constant.SINGLE_CHAT.equals(msgObj.getChatType())) {
+                // 单聊的好友id(就接收人而言),就是发送人
+                msgObj.setFriendId(msgObj.getSendUserId());
                 // 单聊：在线直接发送
                 channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
-                    ChannelFuture sendFuture = channelGroup.find(v).writeAndFlush(new TextWebSocketFrame(msg.text()));
-                    sendFuture.addListener((ChannelFutureListener) future -> {
-                        
-                        // 异步存储消息
-                        Runnable asynSaveMsg = () -> {
-                            ChatMsgPO chatMsg = BeanConvert.convertSingle(msgObj, ChatMsgPO.class);
-                            chatMsg.setCreatorId(verify.getUserId());
-                            chatMsg.setCreatorBy(verify.getUsername());
-                            chatMsg.setGroupType(0);
-                            chatMsg.setStatus(future.isSuccess() ? Constant.MSG_SEND_SUCCESSED : Constant.MSG_SEND_FAILED);
-                            chatMsg.setMsgType(MsgTypeEnum.SEND_MSG.getType());
-                            chatMsg.setDr(Constant.NOT_DELETE);
-                            iChatMsgService.save(chatMsg);
-                        };
-                        EXECUTOR_FIXED.submit(asynSaveMsg);
-                    });
+                    Channel channel = channelGroup.find(v);
+                    if (channel != null) {
+                        ChannelFuture sendFuture = channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msgObj)));
+                        sendFuture.addListener((ChannelFutureListener) future -> {
+                            if (future.isSuccess()) {
+                                ChatMsgPO updateMsgStatus = new ChatMsgPO();
+                                updateMsgStatus.setId(chatMsg.getId());
+                                updateMsgStatus.setStatus(Constant.MSG_SEND_SUCCESSED);
+                                iChatMsgService.updateById(updateMsgStatus);
+                            }
+                        });
+                    }
                     return v;
                 });
             } else if ((Constant.MUILT_CHAT.equals(msgObj.getChatType()))) {
                 // 群聊消息推送所有实例，进行广播
+                msgObj.setMsgId(chatMsg.getId());
+                asyncProducerMuiltChat.asyncSend(chatTopic, JSON.toJSONString(msgObj));
             }
-
-            
             
         }
         // TODO 离线，存储数据库，接收人上线拉取
     }
+
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
@@ -143,7 +166,7 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
             if (evt instanceof IdleStateEvent) {
                 IdleStateEvent event = (IdleStateEvent) evt;
                 if (event.state() == IdleState.ALL_IDLE) {
-                    Channel channel = ctx.channel();
+                    // Channel channel = ctx.channel();
                     removeChannelId(ctx);
                 }
             }
