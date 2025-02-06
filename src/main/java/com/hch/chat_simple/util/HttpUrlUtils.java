@@ -1,6 +1,5 @@
 package com.hch.chat_simple.util;
 
-import java.util.Map;
 
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponents;

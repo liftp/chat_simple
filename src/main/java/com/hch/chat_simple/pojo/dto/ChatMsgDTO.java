@@ -3,7 +3,6 @@ package com.hch.chat_simple.pojo.dto;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.hch.chat_simple.pojo.vo.UserVO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
