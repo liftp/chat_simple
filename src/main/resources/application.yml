@@ -42,9 +42,11 @@ rocketmq:
     group: async-producer-group
   consumer:
     group: async-consumer-group
+    single: async-consumer-single
 mq:
   topic:
-    chat: muilt_chat
+    muilt-chat: muilt-chat
+    single-chat: single-chat
 
   
 redisson:

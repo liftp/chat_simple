@@ -53,8 +53,11 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
     static final ChannelGroup channelGroup = NettyGroup.getChannelGroup();
     static final ExecutorService EXECUTOR_FIXED = Executors.newFixedThreadPool(16);
 
-    @Value("${mq.topic.chat}")
-    private String chatTopic;
+    @Value("${mq.topic.muilt-chat}")
+    private String muiltChatTopic;
+
+    @Value("${mq.topic.single-chat}")
+    private String singleChatTopic;
 
     @Resource
     private IChatMsgService iChatMsgService;
@@ -90,29 +93,12 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
             chatMsg.setDr(Constant.NOT_DELETE);
             iChatMsgService.save(chatMsg);
 
+            msgObj.setMsgId(chatMsg.getId());
             if (Constant.SINGLE_CHAT.equals(msgObj.getChatType())) {
-                // 单聊的好友id(就接收人而言),就是发送人
-                msgObj.setFriendId(msgObj.getSendUserId());
-                // 单聊：在线直接发送
-                channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
-                    Channel channel = channelGroup.find(v);
-                    if (channel != null) {
-                        ChannelFuture sendFuture = channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msgObj)));
-                        sendFuture.addListener((ChannelFutureListener) future -> {
-                            if (future.isSuccess()) {
-                                ChatMsgPO updateMsgStatus = new ChatMsgPO();
-                                updateMsgStatus.setId(chatMsg.getId());
-                                updateMsgStatus.setStatus(Constant.MSG_SEND_SUCCESSED);
-                                iChatMsgService.updateById(updateMsgStatus);
-                            }
-                        });
-                    }
-                    return v;
-                });
+                asyncProducerMuiltChat.asyncSend(singleChatTopic, JSON.toJSONString(msgObj));
             } else if ((Constant.MUILT_CHAT.equals(msgObj.getChatType()))) {
                 // 群聊消息推送所有实例，进行广播
-                msgObj.setMsgId(chatMsg.getId());
-                asyncProducerMuiltChat.asyncSend(chatTopic, JSON.toJSONString(msgObj));
+                asyncProducerMuiltChat.asyncSend(muiltChatTopic, JSON.toJSONString(msgObj));
             }
             
         }

@@ -31,7 +31,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
 @Component
 @RocketMQMessageListener(
-    topic = "${mq.topic.chat}",
+    topic = "${mq.topic.multi-chat}",
     consumerGroup = "${rocketmq.consumer.group}",
     consumeMode = ConsumeMode.CONCURRENTLY,
     messageModel = MessageModel.BROADCASTING
@@ -59,12 +59,7 @@ public class AsyncConsumerMuiltChat implements RocketMQListener<String> {
     public void muiltChatMsgConsume(String msg) {
         ChatMsgDTO msgObj = JSON.parseObject(msg, ChatMsgDTO.class);
         // 在线，直接发送
-        if (MsgTypeEnum.SEND_MSG.getType().equals(msgObj.getMsgType()) && msgObj.getReceiveUserId() != null) {
-            // UserVO userVO = msgObj.getSendUser();
-            // msgObj.setSendUserId(userVO.getId());
-            LocalDateTime now = LocalDateTime.now();
-            msgObj.setCreatedAt(now);
-            msgObj.setDateTime(now.atZone(ZoneId.of(Constant.ZONED_SHANGHAI)).toInstant().toEpochMilli() + "");
+        if (MsgTypeEnum.SEND_MSG.getType().equals(msgObj.getMsgType()) && msgObj.getGroupId() != null) {
             // 查询群聊的用户，遍历（除了发送人）进行发送，后续可以缓存优化
             List<GroupMemberPO> members = selectGroupMemberById(msgObj.getGroupId());
             // TODO 发送用户是否有权限，进行校验
