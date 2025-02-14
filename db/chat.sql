@@ -23,7 +23,7 @@ CREATE TABLE friend_relationship (
     friend_id BIGINT COMMENT '朋友id',
     friend_name VARCHAR(64) COMMENT '朋友名称',
     friend_remark VARCHAR(64) COMMENT '朋友备注',
-    self_id DATETIME COMMENT '好友关系所属id',
+    self_id BIGINT COMMENT '好友关系所属id',
     creator_id BIGINT COMMENT '创建人id',
     creator_by VARCHAR(64) COMMENT '创建人姓名',
     updated_at DATETIME COMMENT '修改时间',
@@ -85,3 +85,21 @@ CREATE TABLE group_member (
     modifier_by VARCHAR(64) COMMENT '修改人姓名',
     dr TINYINT(1) COMMENT '是否删除 0:未删除 1:已删除'
 ) COMMENT '群组成员';
+
+
+CREATE TABLE apply_friend (  
+	id bigint NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
+	proposer_id BIGINT COMMENT '申请人id',
+	proposer_name BIGINT COMMENT '申请人名称',
+	proposer_remark VARCHAR(64) COMMENT '申请人备注',
+	proposer_reason VARCHAR(64) COMMENT '申请理由',
+	target_user BIGINT COMMENT '被申请好友id', 
+	apply_status TINYINT(4) COMMENT '申请状态： 0:申请中 1:通过 2:拒绝',
+	created_at DATETIME COMMENT '创建时间',
+	creator_id BIGINT COMMENT '创建人id',
+	creator_by VARCHAR(64) COMMENT '创建人姓名',
+	updated_at DATETIME COMMENT '修改时间',
+	modifier_id BIGINT COMMENT '修改人id',
+	modifier_by VARCHAR(64) COMMENT '修改人姓名',
+	dr TINYINT(1) COMMENT '是否删除 0:未删除 1:已删除'
+) COMMENT '好友申请记录'

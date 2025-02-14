@@ -6,7 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hch.chat_simple.pojo.dto.ApplyFriendDTO;
 import com.hch.chat_simple.pojo.vo.FriendRelationshipVO;
+import com.hch.chat_simple.service.IApplyFriendService;
 import com.hch.chat_simple.service.IFriendRelationshipService;
 import com.hch.chat_simple.util.Payload;
 
@@ -28,9 +30,17 @@ public class FriendRelationshipController {
 
     private final IFriendRelationshipService iFriendRelationshipService;
 
+    private final IApplyFriendService iApplyFriendService;
+
     @PostMapping("firendList")
     @Operation(description = "好友列表")
     public Payload<List<FriendRelationshipVO>> firendList() {
         return Payload.success(iFriendRelationshipService.listFriendRelationship());
+    }
+
+    @PostMapping("applyFriend")
+    @Operation(description = "好友申请")
+    public Payload applyFriend(ApplyFriendDTO applyFriend) {
+        return Payload.success(true);
     }
 }

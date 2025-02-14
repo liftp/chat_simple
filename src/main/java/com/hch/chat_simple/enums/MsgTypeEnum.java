@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum MsgTypeEnum {
     UP_LINE(1, "上线"),
     SEND_MSG(2, "发送消息"),
-    DOWN_LINE(3, "下线");
+    DOWN_LINE(3, "下线"),
+    APPLY_FRIEND(4, "申请好友");
     private Integer type;
     private String name;
     MsgTypeEnum(Integer type, String name) {

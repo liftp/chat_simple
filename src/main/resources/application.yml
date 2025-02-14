@@ -47,6 +47,7 @@ mq:
   topic:
     muilt-chat: muilt-chat
     single-chat: single-chat
+    composition: composition
 
   
 redisson:

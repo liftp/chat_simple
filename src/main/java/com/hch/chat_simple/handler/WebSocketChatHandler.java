@@ -2,7 +2,6 @@ package com.hch.chat_simple.handler;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,12 +14,11 @@ import org.springframework.stereotype.Component;
 import com.alibaba.fastjson.JSON;
 import com.hch.chat_simple.config.NettyGroup;
 import com.hch.chat_simple.enums.MsgTypeEnum;
-import com.hch.chat_simple.mq.AsyncProducerMuiltChat;
+import com.hch.chat_simple.mq.AsyncProducer;
 import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
 import com.hch.chat_simple.pojo.dto.TokenInfoDTO;
 import com.hch.chat_simple.pojo.dto.WebSocketPerssionVerify;
 import com.hch.chat_simple.pojo.po.ChatMsgPO;
-import com.hch.chat_simple.pojo.vo.UserVO;
 import com.hch.chat_simple.service.IChatMsgService;
 import com.hch.chat_simple.util.BeanConvert;
 import com.hch.chat_simple.util.Constant;
@@ -28,8 +26,6 @@ import com.hch.chat_simple.util.SnowflakeIdGen;
 import com.hch.chat_simple.util.TokenUtil;
 
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -66,7 +62,7 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
     private SnowflakeIdGen snowflakeIdGen;
 
     @Autowired
-    private AsyncProducerMuiltChat asyncProducerMuiltChat;
+    private AsyncProducer asyncProducerMuiltChat;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {

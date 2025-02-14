@@ -2,7 +2,6 @@ package com.hch.chat_simple.service;
 
 import com.hch.chat_simple.pojo.po.FriendRelationshipPO;
 import com.hch.chat_simple.pojo.vo.FriendRelationshipVO;
-import com.hch.chat_simple.util.PageBean;
 
 import java.util.List;
 
