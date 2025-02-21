@@ -1,12 +1,16 @@
-package com.hch.chat_simple.pojo.dto;
+package com.hch.chat_simple.pojo.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
-@Schema(name = "ApplyFriendDTO", description = "申请好友DTO")
-public class ApplyFriendDTO {
+@Schema(name = "ApplyFriendVO", description = "申请好友VO")
+public class ApplyFriendVO {
     
+
+
+    @Schema(description = "id")
+    private String id;
 
     @Schema(description = "申请人id")
     private Long proposerId;
@@ -33,4 +37,6 @@ public class ApplyFriendDTO {
     // 申请结果
     @Schema(description = "申请是否通过: 0-拒绝 1-成功")
     private Integer applyPass;
+
+
 }

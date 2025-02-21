@@ -3,10 +3,12 @@ package com.hch.chat_simple.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hch.chat_simple.pojo.dto.ApplyFriendDTO;
+import com.hch.chat_simple.pojo.query.FriendRelationshipQuery;
 import com.hch.chat_simple.pojo.vo.FriendRelationshipVO;
 import com.hch.chat_simple.service.IApplyFriendService;
 import com.hch.chat_simple.service.IFriendRelationshipService;
@@ -24,7 +26,7 @@ import lombok.AllArgsConstructor;
  * @since 2024-12-06
  */
 @RestController
-@RequestMapping("/friendRelationship")
+@RequestMapping("/friendship")
 @AllArgsConstructor
 public class FriendRelationshipController {
 
@@ -32,13 +34,13 @@ public class FriendRelationshipController {
 
     private final IApplyFriendService iApplyFriendService;
 
-    @PostMapping("firendList")
+    @PostMapping("/friendList")
     @Operation(description = "好友列表")
-    public Payload<List<FriendRelationshipVO>> firendList() {
-        return Payload.success(iFriendRelationshipService.listFriendRelationship());
+    public Payload<List<FriendRelationshipVO>> friendList(@RequestBody FriendRelationshipQuery query) {
+        return Payload.success(iFriendRelationshipService.listFriendRelationship(query));
     }
 
-    @PostMapping("applyFriend")
+    @PostMapping("/applyFriend")
     @Operation(description = "好友申请")
     public Payload applyFriend(ApplyFriendDTO applyFriend) {
         return Payload.success(true);

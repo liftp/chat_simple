@@ -43,6 +43,7 @@ rocketmq:
   consumer:
     group: async-consumer-group
     single: async-consumer-single
+    composition: async-consumer-composition
 mq:
   topic:
     muilt-chat: muilt-chat

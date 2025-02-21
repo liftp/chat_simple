@@ -1,6 +1,8 @@
 package com.hch.chat_simple.service;
 
+import com.hch.chat_simple.pojo.dto.ApplyFriendDTO;
 import com.hch.chat_simple.pojo.po.FriendRelationshipPO;
+import com.hch.chat_simple.pojo.query.FriendRelationshipQuery;
 import com.hch.chat_simple.pojo.vo.FriendRelationshipVO;
 
 import java.util.List;
@@ -17,5 +19,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IFriendRelationshipService extends IService<FriendRelationshipPO> {
 
-    List<FriendRelationshipVO> listFriendRelationship();
+    List<FriendRelationshipVO> listFriendRelationship(FriendRelationshipQuery query);
+
+    void insertFriendRelationship(ApplyFriendDTO applyFriend);
 }
