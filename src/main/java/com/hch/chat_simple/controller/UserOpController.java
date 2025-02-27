@@ -1,6 +1,7 @@
 package com.hch.chat_simple.controller;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import com.hch.chat_simple.auth.NoAuth;
 import com.hch.chat_simple.pojo.dto.TokenInfoDTO;
 import com.hch.chat_simple.pojo.dto.UserLoginDTO;
 import com.hch.chat_simple.pojo.po.UserPO;
+import com.hch.chat_simple.pojo.query.UserQuery;
 import com.hch.chat_simple.pojo.vo.UserVO;
 import com.hch.chat_simple.service.IUserService;
 import com.hch.chat_simple.util.BeanConvert;
@@ -92,6 +94,12 @@ public class UserOpController {
         u.setCreatedAt(LocalDateTime.now());
         iUserService.save(u);
         return Payload.success("");
+    }
+
+    @PostMapping("/searchUser")
+    @Operation(description = "搜索用户")
+    public Payload<List<UserVO>> searchUser(@Valid @RequestBody UserQuery query) {
+        return Payload.success(iUserService.searchUserByName(query));
     }
 
 }

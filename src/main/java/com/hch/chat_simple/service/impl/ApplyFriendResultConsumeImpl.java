@@ -32,8 +32,8 @@ public class ApplyFriendResultConsumeImpl implements ICompositionConsumeService 
             iFriendRelationshipService.insertFriendRelationship(applyFriend);
         }
         // 注意：这里可以屏蔽被申请人对申请人的备注信息，然后发送，暂时未处理
-        // 通知申请方结果
-        handler.handle(applyFriend.getProposerId(), msg, () -> {});
+        // 通知申请方结果，保持前端约定格式 msgType + "," + msgObj,这里和后端的不同，不用加userId
+        handler.handle(applyFriend.getProposerId(), MsgTypeEnum.APPLY_FRIEND_RESULT.getType() + "," + msg, () -> {});
     }
 
     @Override

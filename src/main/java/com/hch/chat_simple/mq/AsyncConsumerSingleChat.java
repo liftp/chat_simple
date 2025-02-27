@@ -49,13 +49,14 @@ public class AsyncConsumerSingleChat  implements RocketMQListener<String> {
         // 在线，直接发送
         if (MsgTypeEnum.SEND_MSG.getType().equals(msgObj.getMsgType()) && msgObj.getReceiveUserId() != null) {
             // TODO 发送用户是否有权限，进行校验
-            if (Constant.MUILT_CHAT.equals(msgObj.getChatType())) {
+            if (Constant.SINGLE_CHAT.equals(msgObj.getChatType())) {
                 msgObj.setFriendId(msgObj.getSendUserId());
                 // 在线直接发送
                 channelMap.computeIfPresent(msgObj.getReceiveUserId(), (k, v) -> {
                     Channel channel = channelGroup.find(v);
                     if (channel != null) {
-                        ChannelFuture sendFuture = channel.writeAndFlush(new TextWebSocketFrame(msg));
+                        // 约定格式 msgType + "," + msgObj
+                        ChannelFuture sendFuture = channel.writeAndFlush(new TextWebSocketFrame(MsgTypeEnum.SEND_MSG.getType() + "," + JSON.toJSONString(msgObj)));
                         sendFuture.addListener(future -> {
                             if (future.isSuccess()) {
                                 ChatMsgPO updateMsgStatus = new ChatMsgPO();

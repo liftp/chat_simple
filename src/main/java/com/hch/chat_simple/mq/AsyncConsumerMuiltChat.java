@@ -70,7 +70,8 @@ public class AsyncConsumerMuiltChat implements RocketMQListener<String> {
                         channelMap.computeIfPresent(receiveUser.getId(), (k, v) -> {
                             Channel channel = channelGroup.find(v);
                             if (channel != null) {
-                                channel.writeAndFlush(new TextWebSocketFrame(msg));
+                                // 前端约定格式 msgType + "," + msgObj
+                                channel.writeAndFlush(new TextWebSocketFrame(MsgTypeEnum.SEND_MSG.getType() + "," + msg));
                             }
                             return v;
                         });

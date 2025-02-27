@@ -1,6 +1,9 @@
 package com.hch.chat_simple.pojo.dto;
 
+
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -15,12 +18,14 @@ public class ApplyFriendDTO {
     private String proposerName;
 
     @Schema(description = "申请人备注")
+    @NotBlank(message = "本人描述不能为空")
     private String proposerRemark;
 
     @Schema(description = "申请理由")
     private String proposerReason;
 
     @Schema(description = "被申请好友id")
+    @NotNull(message = "添加好友的id不能为空")
     private Long targetUser;
 
     // 备注区用于好友列表展示
