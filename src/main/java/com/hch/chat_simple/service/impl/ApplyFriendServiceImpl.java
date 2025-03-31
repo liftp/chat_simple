@@ -56,7 +56,7 @@ public class ApplyFriendServiceImpl extends ServiceImpl<ApplyFriendMapper, Apply
         save(po);
 
         // 推送申请消息, 约定：消息类型+','+消息体，这样后续直接解析类型，之后再转对应的消息内容
-        asyncProducer.asyncSend(compositionTopicName, MsgTypeEnum.APPLY_FRIEND.getType() + "," + JSON.toJSONString(po));
+        asyncProducer.asyncSend(compositionTopicName, MsgTypeEnum.APPLY_FRIEND.getType() + "," + po.getTargetUser() + "," + JSON.toJSONString(po));
         return po.getId();
     }
 

@@ -37,10 +37,10 @@ public class AsyncConsumerCompositionBusiness implements RocketMQListener<String
             String typeStr = message.substring(0, index);
             if (checkMsgAndNum.apply(typeStr)) {
                 msgType = Integer.parseInt(typeStr);
-                int secondIndex = typeStr.indexOf(",");
-                String secondStr = secondIndex < index + 1 ? "" : typeStr.substring(index + 1, secondIndex);
+                int secondIndex = message.indexOf(",", index + 1);
+                String secondStr = secondIndex < index + 1 ? "" : message.substring(index + 1, secondIndex);
                 if (checkMsgAndNum.apply(secondStr)) {
-                    msgConsume(msgType, Long.parseLong(secondStr), typeStr.substring(index + 1));
+                    msgConsume(msgType, Long.parseLong(secondStr), msgType + "," + message.substring(secondIndex + 1));
                 }
             }
             

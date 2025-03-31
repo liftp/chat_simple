@@ -3,8 +3,8 @@ package com.hch.chat_simple.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +15,7 @@ import com.hch.chat_simple.service.IApplyFriendService;
 import com.hch.chat_simple.util.Payload;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.validation.Valid;
 
 /**
  * <p>
@@ -34,13 +34,13 @@ public class ApplyFriendController {
 
     @PostMapping("applyRecord")
     @Operation(description = "好友申请记录列表")
-    public Payload<List<ApplyFriendVO>> applyRecord(@RequestParam Long dataId) {
+    public Payload<List<ApplyFriendVO>> applyRecord(@RequestParam(required = false) Long dataId) {
         return Payload.success(iAppFriendService.applyList(dataId));
     }
 
     @PostMapping("applyFriend")
     @Operation(description = "好友申请")
-    public Payload<Long> applyFriend(@Validated @RequestBody ApplyFriendDTO dto) {
+    public Payload<Long> applyFriend(@Valid @RequestBody ApplyFriendDTO dto) {
         return Payload.success(iAppFriendService.applyFriend(dto));
     }
 

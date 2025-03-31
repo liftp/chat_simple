@@ -9,6 +9,7 @@ import com.hch.chat_simple.config.NettyGroup;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelId;
 import io.netty.channel.group.ChannelGroup;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
 @Component
 public class ChannelSendIfPresentHandler {
@@ -18,12 +19,12 @@ public class ChannelSendIfPresentHandler {
     static final ChannelGroup channelGroup = NettyGroup.getChannelGroup();
         
     public void handle(Long channelKey, String msg, Runnable execute) {
-        channelMap.computeIfPresent(1L, 
+        channelMap.computeIfPresent(channelKey, 
             (k, v) -> {
                 Channel ch = channelGroup.find(v);
                 if (ch != null) {
                     execute.run();
-                    ch.writeAndFlush(msg);
+                    ch.writeAndFlush(new TextWebSocketFrame(msg));
                 }
                 return v;
             }
