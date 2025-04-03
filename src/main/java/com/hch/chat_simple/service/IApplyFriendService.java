@@ -20,4 +20,6 @@ public interface IApplyFriendService extends IService<ApplyFriendPO> {
     Long applyFriend(ApplyFriendDTO applyFriend);
 
     List<ApplyFriendVO> applyList(Long dataId);
+
+    Long applyFriendConfirm(ApplyFriendDTO applyFriend);
 }

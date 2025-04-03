@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * <p>
@@ -18,9 +19,10 @@ import lombok.Data;
  * @since 2025-02-14
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @TableName("apply_friend")
 @Schema(name = "ApplyFriendPO", description = "好友申请记录")
-public class ApplyFriendPO implements Serializable {
+public class ApplyFriendPO extends BasePO {
 
     private static final long serialVersionUID = 1L;
 
@@ -46,25 +48,4 @@ public class ApplyFriendPO implements Serializable {
     @Schema(description = "申请状态： 0:申请中 1:通过 2:拒绝")
     private Integer applyStatus;
 
-    @Schema(description = "创建时间")
-    private LocalDateTime createdAt;
-
-    @Schema(description = "创建人id")
-    private Long creatorId;
-
-    @Schema(description = "创建人姓名")
-    private String creatorBy;
-
-    @Schema(description = "修改时间")
-    private LocalDateTime updatedAt;
-
-    @Schema(description = "修改人id")
-    private Long modifierId;
-
-    @Schema(description = "修改人姓名")
-    private String modifierBy;
-
-    @Schema(description = "是否删除 0:未删除 1:已删除")
-    @TableLogic
-    private Integer dr;
 }

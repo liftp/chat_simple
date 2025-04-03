@@ -44,5 +44,11 @@ public class ApplyFriendController {
         return Payload.success(iAppFriendService.applyFriend(dto));
     }
 
+    @PostMapping("applyFriendConfirm")
+    @Operation(description = "好友申请确认")
+    public Payload<Long> applyFriendConfirm(@Valid @RequestBody ApplyFriendDTO dto) {
+        return Payload.success(iAppFriendService.applyFriendConfirm(dto));
+    }
+
     
 }

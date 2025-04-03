@@ -9,11 +9,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @TableName("chat_msg")
 @Schema(name = "ChatMsgPO", description="聊天消息内容")
-public class ChatMsgPO {
+public class ChatMsgPO extends BasePO {
 
     @Schema(description = "id")
     @TableId(value = "id", type = IdType.AUTO)
@@ -42,26 +44,5 @@ public class ChatMsgPO {
     @Schema(description = "消息发送状态 0:失败 1:成功")
     private Integer status;
 
-    @Schema(description = "删除标记：0-未删除，1-已删除")
-    @TableLogic
-    private Integer dr;
-
-    @Schema(description = "创建时间")
-    private LocalDateTime createdAt;
-
-    @Schema(description = "创建人")
-    private String creatorBy;
-
-    @Schema(description = "修改人id")
-    private Long modifierId;
-
-    @Schema(description = "修改人姓名")
-    private String modifierBy;
-
-    @Schema(description = "修改时间")
-    private LocalDateTime updatedAt;
-
-    @Schema(description = "创建人id")
-    private Long creatorId;
 
 }

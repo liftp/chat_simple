@@ -23,7 +23,7 @@ import lombok.Setter;
 @Setter
 // @Schema(name = "User", description = "")
 @TableName("user")
-public class UserPO implements Serializable {
+public class UserPO extends BasePO {
 
     private static final long serialVersionUID = 1L;
 
@@ -43,25 +43,4 @@ public class UserPO implements Serializable {
     //@Schema(description = "生日年月")
     // private LocalDateTime birthday;
 
-    //@Schema(description = "创建日期")
-    private LocalDateTime createdAt;
-
-    //@Schema(description = "创建人id")
-    private Long creatorId;
-
-    //@Schema(description = "创建人姓名")
-    private String creatorBy;
-
-    //@Schema(description = "修改时间")
-    private LocalDateTime updatedAt;
-
-    //@Schema(description = "修改人id")
-    private Long modifierId;
-
-    //@Schema(description = "修改人姓名")
-    private String modifierBy;
-
-    //@Schema(description = "是否删除 0:未删除 1:已删除")
-    @TableLogic
-    private Integer dr;
 }
