@@ -61,6 +61,7 @@ public class ApplyFriendServiceImpl extends ServiceImpl<ApplyFriendMapper, Apply
         po.setCreatedAt(LocalDateTime.now());
         po.setCreatorBy(userName);
         po.setCreatorId(userId);
+        po.setApplyRemark(applyFriend.getAppliedRemark());
         
         save(po);
 
@@ -79,8 +80,10 @@ public class ApplyFriendServiceImpl extends ServiceImpl<ApplyFriendMapper, Apply
         po.setCreatedAt(LocalDateTime.now());
         po.setCreatorBy(userName);
         po.setCreatorId(userId);
+        po.setApplyRemark(applyFriend.getAppliedRemark());
         // 通知申请者，好友申请确认结果
         ApplyResultInfoVO notify = new ApplyResultInfoVO();
+        List<FriendRelationshipPO> ships = null;
         // 如果通过，添加两人的好友关系
         if (ApplyStatusEnum.APPLY_PASS.getStatus().equals(applyFriend.getApplyPass())) {
             // 查询申请的那条记录，取备注作为好友名称
@@ -88,17 +91,20 @@ public class ApplyFriendServiceImpl extends ServiceImpl<ApplyFriendMapper, Apply
 
             FriendRelationshipPO relateInitiator = new FriendRelationshipPO();
             relateInitiator.setFriendId(userId);
-            relateInitiator.setFriendName(initiatorRecord.getProposerRemark());
+            relateInitiator.setFriendName(userName);
+            relateInitiator.setFriendRemark(initiatorRecord.getApplyRemark());
             relateInitiator.setCreatorId(applyFriend.getProposerId());
-            relateInitiator.setCreatorBy(applyFriend.getProposerName());
+            relateInitiator.setCreatorBy(initiatorRecord.getCreatorBy());
 
             FriendRelationshipPO relateTarget = new FriendRelationshipPO();
             relateTarget.setFriendId(applyFriend.getProposerId());
             relateTarget.setFriendName(applyFriend.getProposerName());
+            relateTarget.setFriendRemark(applyFriend.getApplyRemark());
             relateTarget.setCreatorId(userId);
-            relateTarget.setCreatorBy(initiatorRecord.getProposerRemark());
+            relateTarget.setCreatorBy(userName);
 
-            iFriendRelationshipService.saveBatch(Arrays.asList(relateInitiator, relateTarget));
+            ships = Arrays.asList(relateInitiator, relateTarget);
+            iFriendRelationshipService.saveBatch(ships);
             
             notify.setProposerRelationshipId(relateInitiator.getId());
             notify.setTargetRelationshipId(relateTarget.getId());
@@ -111,7 +117,14 @@ public class ApplyFriendServiceImpl extends ServiceImpl<ApplyFriendMapper, Apply
         notify.setProposerRemark(po.getProposerRemark());
         notify.setTargetUser(userId);
 
+        // 发送给申请人 申请通过消息
         asyncProducer.asyncSend(compositionTopicName, MsgTypeEnum.APPLY_FRIEND_RESULT.getType() + "," + po.getProposerId() + "," + JSON.toJSONString(notify));
+        // 发送给双方，添加好友关系的信息
+        if (ships != null) {
+            ships.forEach(s -> {
+                asyncProducer.asyncSend(compositionTopicName, MsgTypeEnum.FRIEND_SHIP_ADD.getType() + "," + s.getCreatorId() + "," + JSON.toJSONString(s));
+            });
+        }
         
         return po.getId();
     }

@@ -44,6 +44,9 @@ public class ApplyFriendPO extends BasePO {
 
     @Schema(description = "被申请好友id")
     private Long targetUser;
+    
+    @Schema(description = "给好友的备注")
+    private String applyRemark;
 
     @Schema(description = "申请状态： 0:申请中 1:通过 2:拒绝")
     private Integer applyStatus;
