@@ -95,6 +95,7 @@ public class ApplyFriendServiceImpl extends ServiceImpl<ApplyFriendMapper, Apply
             relateInitiator.setFriendRemark(initiatorRecord.getApplyRemark());
             relateInitiator.setCreatorId(applyFriend.getProposerId());
             relateInitiator.setCreatorBy(initiatorRecord.getCreatorBy());
+            relateInitiator.setSelfId(applyFriend.getProposerId());
 
             FriendRelationshipPO relateTarget = new FriendRelationshipPO();
             relateTarget.setFriendId(applyFriend.getProposerId());
@@ -102,6 +103,7 @@ public class ApplyFriendServiceImpl extends ServiceImpl<ApplyFriendMapper, Apply
             relateTarget.setFriendRemark(applyFriend.getApplyRemark());
             relateTarget.setCreatorId(userId);
             relateTarget.setCreatorBy(userName);
+            relateTarget.setSelfId(userId);
 
             ships = Arrays.asList(relateInitiator, relateTarget);
             iFriendRelationshipService.saveBatch(ships);

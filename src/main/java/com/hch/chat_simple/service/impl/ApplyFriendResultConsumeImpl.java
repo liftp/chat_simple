@@ -24,18 +24,13 @@ public class ApplyFriendResultConsumeImpl implements ICompositionConsumeService 
 
     @Autowired
     private ChannelSendIfPresentHandler handler;
-    @Autowired
-    private IFriendRelationshipService iFriendRelationshipService;
+
     
     @Override
     public void consumeBusiness(Long chKey, String msg) {
         List<String> content = MsgBodyResolveUtil.bodySplitByDelimiter(msg, 1);
         // msg 去掉msgType再转
         ApplyFriendDTO applyFriend = JSON.parseObject(content.get(1), ApplyFriendDTO.class);
-        // 通过，直接添加好友关系
-        if (YesOrNo.YES.getCode().equals(applyFriend.getApplyPass())) {
-            iFriendRelationshipService.insertFriendRelationship(applyFriend);
-        }
         // 注意：这里可以屏蔽被申请人对申请人的备注信息，然后发送，暂时未处理
         // 通知申请方结果，保持前端约定格式 msgType + "," + msgObj,这里和后端的不同，不用加userId
         handler.handle(applyFriend.getProposerId(), msg, () -> {});
