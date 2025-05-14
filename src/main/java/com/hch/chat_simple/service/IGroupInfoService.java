@@ -1,7 +1,13 @@
 package com.hch.chat_simple.service;
 
+import com.hch.chat_simple.pojo.dto.AddGroupMembersDTO;
 import com.hch.chat_simple.pojo.dto.GroupInfoDTO;
 import com.hch.chat_simple.pojo.po.GroupInfoPO;
+import com.hch.chat_simple.pojo.vo.GroupInfoVO;
+import com.hch.chat_simple.pojo.vo.GroupMemberVO;
+
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -14,6 +20,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IGroupInfoService extends IService<GroupInfoPO> {
 
-    boolean addGroupChat(GroupInfoDTO dto);
+    GroupInfoVO addGroupChat(GroupInfoDTO dto);
 
+    List<GroupMemberVO> findGroupMemberById(Long groupId);
+
+    boolean addGroupMembers(AddGroupMembersDTO dto);
 }

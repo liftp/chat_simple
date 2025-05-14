@@ -1,6 +1,10 @@
 package com.hch.chat_simple.service;
 
 import com.hch.chat_simple.pojo.po.GroupMemberPO;
+import com.hch.chat_simple.pojo.vo.GroupMemberVO;
+
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
