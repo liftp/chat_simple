@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class MsgSenderServiceImpl implements IMsgSenderService{
+public class MsgSenderServiceImpl implements IMsgSenderService {
   
     private final Map<Long, ChannelId> userMapChannel = NettyGroup.getUserMapChannel();
     private final ChannelGroup channelGroup = NettyGroup.getChannelGroup();

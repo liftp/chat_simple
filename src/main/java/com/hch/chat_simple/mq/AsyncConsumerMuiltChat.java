@@ -63,11 +63,11 @@ public class AsyncConsumerMuiltChat implements RocketMQListener<String> {
             // TODO 发送用户是否有权限，进行校验
             if (Constant.MUILT_CHAT.equals(msgObj.getChatType())) {
                 members.forEach(receiveUser -> {
-                    if (!receiveUser.getId().equals(msgObj.getSendUserId())) {
+                    if (!receiveUser.getMemberId().equals(msgObj.getSendUserId())) {
                         // msgObj.setReceiveUserId(receiveUser.getId());
                         msgObj.setFriendId(Constant.SINGLE_CHAT.equals(msgObj.getChatType()) ? msgObj.getSendUserId() : msgObj.getGroupId());
                         // 在线直接发送
-                        channelMap.computeIfPresent(receiveUser.getId(), (k, v) -> {
+                        channelMap.computeIfPresent(receiveUser.getMemberId(), (k, v) -> {
                             Channel channel = channelGroup.find(v);
                             if (channel != null) {
                                 // 前端约定格式 msgType + "," + msgObj

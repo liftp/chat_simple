@@ -49,8 +49,8 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
     static final ChannelGroup channelGroup = NettyGroup.getChannelGroup();
     static final ExecutorService EXECUTOR_FIXED = Executors.newFixedThreadPool(16);
 
-    @Value("${mq.topic.muilt-chat}")
-    private String muiltChatTopic;
+    @Value("${mq.topic.multi-chat}")
+    private String multiChatTopic;
 
     @Value("${mq.topic.single-chat}")
     private String singleChatTopic;
@@ -94,7 +94,7 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
                 asyncProducerMuiltChat.asyncSend(singleChatTopic, JSON.toJSONString(msgObj));
             } else if ((Constant.MUILT_CHAT.equals(msgObj.getChatType()))) {
                 // 群聊消息推送所有实例，进行广播
-                asyncProducerMuiltChat.asyncSend(muiltChatTopic, JSON.toJSONString(msgObj));
+                asyncProducerMuiltChat.asyncSend(multiChatTopic, JSON.toJSONString(msgObj));
             }
             
         }

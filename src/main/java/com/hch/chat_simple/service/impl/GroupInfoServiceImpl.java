@@ -7,12 +7,15 @@ import com.hch.chat_simple.pojo.po.GroupMemberPO;
 import com.hch.chat_simple.pojo.po.UserPO;
 import com.hch.chat_simple.pojo.vo.GroupInfoVO;
 import com.hch.chat_simple.pojo.vo.GroupMemberVO;
+import com.hch.chat_simple.enums.MsgTypeEnum;
 import com.hch.chat_simple.mapper.GroupInfoMapper;
+import com.hch.chat_simple.mq.AsyncProducer;
 import com.hch.chat_simple.service.IGroupInfoService;
 import com.hch.chat_simple.service.IGroupMemberService;
 import com.hch.chat_simple.service.IUserService;
 import com.hch.chat_simple.util.BeanConvert;
 import com.hch.chat_simple.util.ContextUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -24,6 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +47,12 @@ public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapper, GroupInfo
 
     @Autowired
     private IUserService iUserService;
+
+    @Autowired
+    private AsyncProducer asyncProducer;
+
+    @Value("${mq.topic.composition}")
+    private String compositionTopicName;
 
     @Override
     @Transactional
@@ -84,7 +94,7 @@ public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapper, GroupInfo
         Map<Long, UserPO> userIdMap  = userList.stream().collect(Collectors.toMap(UserPO::getId, Function.identity()));
         // 查询group已有的成员，添加时过滤
         List<GroupMemberVO> havedMembers = findGroupMemberById(dto.getGroupId());
-        Set<Long> memberIdsFilter = havedMembers.stream().map(e -> e.getId()).collect(Collectors.toSet());
+        Set<Long> memberIdsFilter = havedMembers.stream().map(e -> e.getMemberId()).collect(Collectors.toSet());
         List<GroupMemberPO> insertList = dto.getUserIds().stream()
             .filter(e -> !memberIdsFilter.contains(e))
             .map(e -> {
@@ -94,7 +104,14 @@ public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapper, GroupInfo
                 po.setMemberName(userIdMap.get(e).getUsername());
                 return po;
             }).collect(Collectors.toList());
+        // 添加的成员进行通知
         iGroupMemberService.saveBatch(insertList);
+        // find group by id 
+        GroupInfoPO group = getById(dto.getGroupId());
+        String groupJson = JSON.toJSONString(group);
+        insertList.forEach(e -> {
+            asyncProducer.asyncSend(compositionTopicName, MsgTypeEnum.GROUP_MEMBER_ADD.getType() + "," + e.getMemberId() + "," + groupJson);
+        });
         return true;
     }
 }

@@ -9,7 +9,8 @@ public enum MsgTypeEnum {
     DOWN_LINE(3, "下线"),
     APPLY_FRIEND(4, "申请好友"),
     APPLY_FRIEND_RESULT(5, "申请好友结果"),
-    FRIEND_SHIP_ADD(6, "添加好友关系")
+    FRIEND_SHIP_ADD(6, "添加好友关系"),
+    GROUP_MEMBER_ADD(7, "群聊成员添加")
     ;
     private Integer type;
     private String name;
