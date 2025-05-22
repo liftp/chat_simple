@@ -24,5 +24,7 @@ public interface IGroupInfoService extends IService<GroupInfoPO> {
 
     List<GroupMemberVO> findGroupMemberById(Long groupId);
 
+    List<GroupMemberVO> findAllGroupMemberById(Long groupId);
+
     boolean addGroupMembers(AddGroupMembersDTO dto);
 }

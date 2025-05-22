@@ -14,6 +14,7 @@ import com.hch.chat_simple.service.IGroupInfoService;
 import com.hch.chat_simple.service.IGroupMemberService;
 import com.hch.chat_simple.service.IUserService;
 import com.hch.chat_simple.util.BeanConvert;
+import com.hch.chat_simple.util.Constant;
 import com.hch.chat_simple.util.ContextUtil;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -59,6 +60,7 @@ public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapper, GroupInfo
     public GroupInfoVO addGroupChat(GroupInfoDTO dto) {
         Long userId = ContextUtil.getUserId();
         String uesrname = ContextUtil.getUsername();
+        String realname = ContextUtil.getRealName();
         GroupInfoPO po = BeanConvert.convertSingle(dto, GroupInfoPO.class);
         po.setSelfId(ContextUtil.getUserId());
         
@@ -69,7 +71,7 @@ public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapper, GroupInfo
         memberPO.setGroupId(po.getId());
         memberPO.setMemberId(userId);
         memberPO.setMemberName(uesrname);
-        memberPO.setMemberRemark(uesrname);
+        memberPO.setMemberRemark(realname);
         memberPO.setInviteId(userId);
         
         iGroupMemberService.save(memberPO);
@@ -78,6 +80,16 @@ public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapper, GroupInfo
 
     @Override
     public List<GroupMemberVO> findGroupMemberById(Long groupId) {
+        Wrapper<GroupMemberPO> queryMember = Wrappers.<GroupMemberPO>query().lambda()
+            .eq(GroupMemberPO::getStatus, Constant.IN_GROUP)
+            .eq(GroupMemberPO::getGroupId, groupId);
+        List<GroupMemberPO> members = iGroupMemberService.list(queryMember);
+        
+        return BeanConvert.convert(members, GroupMemberVO.class);
+    }
+
+    @Override
+    public List<GroupMemberVO> findAllGroupMemberById(Long groupId) {
         Wrapper<GroupMemberPO> queryMember = Wrappers.<GroupMemberPO>query().lambda()
             .eq(GroupMemberPO::getGroupId, groupId);
         List<GroupMemberPO> members = iGroupMemberService.list(queryMember);

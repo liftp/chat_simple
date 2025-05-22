@@ -57,4 +57,11 @@ public class GroupInfoController {
 
         return Payload.success(iGroupInfoService.addGroupMembers(dto));
     }
+
+    @GetMapping("findAllGroupMemberById")
+    @Operation(description = "查询全部群聊成员，包含被离开的成员，用于聊天记录展示")
+    public Payload<List<GroupMemberVO>> findAllGroupMemberById(@RequestParam Long groupId) {
+
+        return Payload.success(iGroupInfoService.findAllGroupMemberById(groupId));
+    }
 }

@@ -42,4 +42,7 @@ public class GroupMemberPO extends BasePO {
     @Schema(description = "邀请人")
     private Long inviteId;
 
+    @Schema(description = "成员群组中状态 0: 在群聊中 1: 离开群聊，默认1")
+    private Integer status;
+
 }

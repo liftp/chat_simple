@@ -19,4 +19,8 @@ public class Constant {
     // 聊天类型
     public static final Integer SINGLE_CHAT = 1;
     public static final Integer MUILT_CHAT = 2;
+
+    // 成员在群组中的状态 正常：1 离开：0
+    public static final Integer IN_GROUP = 1;
+    public static final Integer LEAVE_GROUP = 0;
 }
