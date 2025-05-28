@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSON;
 import com.hch.chat_simple.config.NettyGroup;
+import com.hch.chat_simple.enums.MsgTypeEnum;
 import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
 import com.hch.chat_simple.service.IMsgSenderService;
 import com.hch.chat_simple.util.BeanConvert;
@@ -41,6 +42,9 @@ public class MsgSenderServiceImpl implements IMsgSenderService {
                     // 接收成功或失败，记录状态，失败下次登录拉取
                     boolean receiveStatus = result.isSuccess();
                     log.info("接收状态：{}", receiveStatus);
+                    // // 单聊更新消息状态， 
+                    // if (Integer.valueOf(1).equals(msg.getChatType()) && receiveStatus) {
+                    // }
                     // record msg
                 });
                 return;

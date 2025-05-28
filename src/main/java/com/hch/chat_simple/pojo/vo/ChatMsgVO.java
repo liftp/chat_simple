@@ -22,7 +22,7 @@ public class ChatMsgVO {
     private Integer msgType;
 
     @Schema(description = "是否群聊 0:单聊 1:群聊")
-    private Integer groupType;
+    private Integer chatType;
     
     @Schema(description = "发送人")
     private Long sendUserId;
@@ -50,6 +50,6 @@ public class ChatMsgVO {
     private Long creatorId;
 
     @Schema(description = "根据创建时间生成的时间戳")
-    private String dateTime;
+    private Long dateTime;
 
 }

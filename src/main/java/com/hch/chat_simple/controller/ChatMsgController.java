@@ -3,6 +3,8 @@ package com.hch.chat_simple.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
+import com.hch.chat_simple.pojo.query.GroupNotReadMsgQuery;
 import com.hch.chat_simple.pojo.vo.ChatMsgVO;
 import com.hch.chat_simple.service.IChatMsgService;
 import com.hch.chat_simple.util.Payload;
@@ -26,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @since 2025-02-01
  */
 @RestController
-@RequestMapping("/chatMsg")
+@RequestMapping("/chatMsg/")
 @Tag(name = "聊天消息")
 public class ChatMsgController {
 
@@ -37,6 +39,18 @@ public class ChatMsgController {
     @Operation(description = "未读消息拉取")
     public Payload<List<ChatMsgVO>> selectNotReadMsg() {
         return Payload.success(iChatMsgService.selectNotReadMsgMsg());
+    }
+
+    @PostMapping("sendMsg")
+    @Operation(description = "发送消息")
+    public Payload<ChatMsgVO> sendMsg(@RequestBody ChatMsgDTO msg) {
+        return Payload.success(iChatMsgService.sendMsg(msg));
+    }
+
+    @PostMapping("selectGroupChatMsgNotRead")
+    @Operation(description = "群聊查询未读消息")
+    public Payload<List<ChatMsgVO>> selectGroupChatMsgNotRead(@RequestBody GroupNotReadMsgQuery query) {
+        return Payload.success(iChatMsgService.selectGroupChatMsgNotRead(query));
     }
     
 }

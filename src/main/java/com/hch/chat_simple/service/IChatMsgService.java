@@ -1,6 +1,8 @@
 package com.hch.chat_simple.service;
 
+import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
 import com.hch.chat_simple.pojo.po.ChatMsgPO;
+import com.hch.chat_simple.pojo.query.GroupNotReadMsgQuery;
 import com.hch.chat_simple.pojo.vo.ChatMsgVO;
 
 import java.util.List;
@@ -19,4 +21,7 @@ public interface IChatMsgService extends IService<ChatMsgPO> {
     
     List<ChatMsgVO> selectNotReadMsgMsg();
 
+    ChatMsgVO sendMsg(ChatMsgDTO msgObj);
+
+    List<ChatMsgVO> selectGroupChatMsgNotRead(GroupNotReadMsgQuery query);
 }

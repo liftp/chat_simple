@@ -83,7 +83,7 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
             ChatMsgPO chatMsg = BeanConvert.convertSingle(msgObj, ChatMsgPO.class);
             chatMsg.setCreatorId(verify.getUserId());
             chatMsg.setCreatorBy(verify.getUsername());
-            chatMsg.setGroupType(0);
+            chatMsg.setChatType(msgObj.getChatType());
             chatMsg.setStatus(Constant.MSG_SEND_FAILED); // 默认发送失败，成功后异步修改状态
             chatMsg.setMsgType(MsgTypeEnum.SEND_MSG.getType());
             chatMsg.setDr(Constant.NOT_DELETE);

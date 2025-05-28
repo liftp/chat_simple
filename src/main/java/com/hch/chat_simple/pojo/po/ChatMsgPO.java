@@ -26,8 +26,8 @@ public class ChatMsgPO extends BasePO {
     @Schema(description = "消息类型")
     private Integer msgType;
 
-    @Schema(description = "是否群聊 0:单聊 1:群聊")
-    private Integer groupType;
+    @Schema(description = "是否群聊 1:单聊 2:群聊")
+    private Integer chatType;
     
     @Schema(description = "发送人")
     private Long sendUserId;

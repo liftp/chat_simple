@@ -37,12 +37,12 @@ CREATE TABLE chat_msg (
     id bigint NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
     
     msg_type TINYINT(1) COMMENT '消息类型 1:上线 2:聊天 3:下线',
-    group_type TINYINT(1) COMMENT '是否群聊 0:单聊 1:群聊',
+    chat_type TINYINT(1) COMMENT '聊天类型 0:单聊 1:群聊',
     send_user_id BIGINT COMMENT '发送人',
     receive_user_id BIGINT COMMENT '接收人，群聊时为空',
-    content VARCHAR(1000) COMMENT '消息内容',
+    `content` VARCHAR(1000) COMMENT '消息内容',
     group_id BIGINT COMMENT '群聊id',
-    status TINYINT(1) COMMENT '群聊i消息发送状态 0:失败 1:成功d',
+    `status` TINYINT(1) COMMENT '群聊消息发送状态 0:失败 1:成功',
     created_at DATETIME(3) COMMENT '创建时间',
     creator_id BIGINT COMMENT '创建人id',
     creator_by VARCHAR(64) COMMENT '创建人姓名',
@@ -77,6 +77,7 @@ CREATE TABLE group_member (
     member_name VARCHAR(64) COMMENT '好友名称',
     member_remark VARCHAR(64) COMMENT '群内备注',
     invite_id BIGINT COMMENT '邀请人',
+    `status` tinyint(1) DEFAULT '1' COMMENT '成员群组中状态 0: 在群聊中 1: 离开群聊',
     created_at DATETIME COMMENT '创建时间',
     creator_id BIGINT COMMENT '创建人id',
     creator_by VARCHAR(64) COMMENT '创建人姓名',
@@ -95,6 +96,7 @@ CREATE TABLE apply_friend (
 	proposer_reason VARCHAR(64) COMMENT '申请理由',
 	target_user BIGINT COMMENT '被申请好友id', 
 	apply_status TINYINT(4) COMMENT '申请状态： 0:申请中 1:通过 2:拒绝',
+    `apply_remark` varchar(64) DEFAULT NULL COMMENT '给好友的备注，用于后面的好友展示',
 	created_at DATETIME COMMENT '创建时间',
 	creator_id BIGINT COMMENT '创建人id',
 	creator_by VARCHAR(64) COMMENT '创建人姓名',
@@ -103,3 +105,18 @@ CREATE TABLE apply_friend (
 	modifier_by VARCHAR(64) COMMENT '修改人姓名',
 	dr TINYINT(1) COMMENT '是否删除 0:未删除 1:已删除'
 ) COMMENT '好友申请记录'
+
+
+CREATE TABLE `notify_msg`  (
+    `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
+    `content` varchar(1000) NULL COMMENT '消息内容',
+    `status` tinyint(1) NULL COMMENT '群聊消息发送状态 0:失败 1:成功',
+    created_at DATETIME COMMENT '创建时间',
+    creator_id BIGINT COMMENT '创建人id',
+    creator_by VARCHAR(64) COMMENT '创建人姓名',
+    updated_at DATETIME COMMENT '修改时间',
+    modifier_id BIGINT COMMENT '修改人id',
+    modifier_by VARCHAR(64) COMMENT '修改人姓名',
+    dr TINYINT(1) COMMENT '是否删除 0:未删除 1:已删除'
+    PRIMARY KEY (`id`)
+) COMMENT = '通知类型消息';
