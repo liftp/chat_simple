@@ -27,13 +27,13 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
 
 @Component
-@RocketMQMessageListener(
-    topic = "${mq.topic.single-chat}",
-    consumerGroup = "${rocketmq.consumer.single}",
-    consumeMode = ConsumeMode.CONCURRENTLY,
-    messageModel = MessageModel.BROADCASTING
-)
-public class AsyncConsumerSingleChat  implements RocketMQListener<String> {
+// @RocketMQMessageListener(
+//     topic = "${mq.topic.single-chat}",
+//     consumerGroup = "${rocketmq.consumer.single}",
+//     consumeMode = ConsumeMode.CONCURRENTLY,
+//     messageModel = MessageModel.BROADCASTING
+// )
+public class AsyncConsumerSingleChat {
     
     // 暂时用Map管理channel，后续使用外部缓存处理
     static final Map<Long, ChannelId> channelMap = NettyGroup.getUserMapChannel();
@@ -73,7 +73,6 @@ public class AsyncConsumerSingleChat  implements RocketMQListener<String> {
     }
 
 
-    @Override
     public void onMessage(String message) {
         try {
             singleChatMsgConsume(message);

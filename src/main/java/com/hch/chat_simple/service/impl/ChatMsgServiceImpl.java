@@ -5,19 +5,25 @@ import com.hch.chat_simple.pojo.po.ChatMsgPO;
 import com.hch.chat_simple.pojo.query.GroupNotReadMsgQuery;
 import com.hch.chat_simple.pojo.query.GroupNotReadMsgQuery.SingleGroupParam;
 import com.hch.chat_simple.pojo.vo.ChatMsgVO;
+import com.hch.chat_simple.pojo.vo.GroupMemberVO;
 import com.hch.chat_simple.enums.MsgTypeEnum;
 import com.hch.chat_simple.mapper.ChatMsgMapper;
 import com.hch.chat_simple.mq.AsyncProducer;
 import com.hch.chat_simple.service.IChatMsgService;
+import com.hch.chat_simple.service.IGroupInfoService;
+import com.hch.chat_simple.service.IGroupMemberService;
 import com.hch.chat_simple.util.BeanConvert;
 import com.hch.chat_simple.util.Constant;
 import com.hch.chat_simple.util.ContextUtil;
+import com.hch.chat_simple.util.InstanceMapTagUtils;
+import com.hch.chat_simple.util.RedisUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
@@ -26,6 +32,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -54,6 +61,9 @@ public class ChatMsgServiceImpl extends ServiceImpl<ChatMsgMapper, ChatMsgPO> im
 
     @Autowired
     private AsyncProducer asyncProducerMuiltChat;
+
+    @Autowired
+    private IGroupInfoService iGroupInfoService;
 
     @Override
     public List<ChatMsgVO> selectNotReadMsgMsg() {
@@ -102,11 +112,22 @@ public class ChatMsgServiceImpl extends ServiceImpl<ChatMsgMapper, ChatMsgPO> im
             save(chatMsg);
 
             msgObj.setMsgId(chatMsg.getId());
+
+            
             if (Constant.SINGLE_CHAT.equals(msgObj.getChatType())) {
-                asyncProducerMuiltChat.asyncSend(singleChatTopic, JSON.toJSONString(msgObj));
+                // 根据接收人，分成不同的tag，进行单独发送
+                int tag = InstanceMapTagUtils.singleIdMapTag(chatMsg.getReceiveUserId());
+                asyncProducerMuiltChat.asyncSend(singleChatTopic + ":" + tag, JSON.toJSONString(msgObj));
             } else if ((Constant.MUILT_CHAT.equals(msgObj.getChatType()))) {
-                // 群聊消息推送所有实例，进行广播
-                asyncProducerMuiltChat.asyncSend(multiChatTopic, JSON.toJSONString(msgObj));
+                // 查询所有用户，根据实例分成不同的tag，分别发送
+                List<GroupMemberVO> groupMembers = iGroupInfoService.findGroupMemberById(chatMsg.getGroupId());
+                List<Long> memberIds = groupMembers.stream().map(GroupMemberVO::getMemberId).collect(Collectors.toList());
+                // 群聊消息推送所有实例，进行广播, 这里可以直接将要发送的人放入消息中，消费端拿到不去查，直接发送
+                Map<Integer, List<Long>> groupTagMap = InstanceMapTagUtils.multiGroupByTag(memberIds);
+                groupTagMap.entrySet().forEach(entry -> {
+                    msgObj.setGroupToUserIds(entry.getValue());
+                    asyncProducerMuiltChat.asyncSend(multiChatTopic + ":" + entry.getKey(), JSON.toJSONString(msgObj));
+                });
             }
             
             return BeanConvert.convert(chatMsg, ChatMsgVO.class, 
@@ -123,10 +144,11 @@ public class ChatMsgServiceImpl extends ServiceImpl<ChatMsgMapper, ChatMsgPO> im
         if (CollectionUtils.isEmpty(query.getGroupList())) {
             return new ArrayList<>();
         }
-        // 多层or可能会慢，也可以调整方案为：默认查前10条，每次前端点击群聊的时候再去查10条后的内容...
+        // 多层or可能会慢，也可以调整方案为：默认查前10条，10条后的内容每次前端点击群聊的时候再去查...
         LambdaQueryWrapper<ChatMsgPO> queryNotRead = Wrappers.<ChatMsgPO>lambdaQuery()
             .eq(ChatMsgPO::getChatType, Constant.MUILT_CHAT);
-        // sql: select * from chat_msg 
+        // sql: 
+        // select * from chat_msg 
         // where chat_type = 2
         //  and dr = 0
         //  and (

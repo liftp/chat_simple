@@ -46,7 +46,7 @@ rocketmq:
     composition: async-consumer-composition
 mq:
   topic:
-    muilt-chat: muilt-chat
+    multi-chat: muilt-chat
     single-chat: single-chat
     composition: composition
 

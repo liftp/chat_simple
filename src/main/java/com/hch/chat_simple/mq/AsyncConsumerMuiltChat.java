@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.rocketmq.spring.annotation.ConsumeMode;
 import org.apache.rocketmq.spring.annotation.MessageModel;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
@@ -28,13 +29,13 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
 @Component
-@RocketMQMessageListener(
-    topic = "${mq.topic.multi-chat}",
-    consumerGroup = "${rocketmq.consumer.group}",
-    consumeMode = ConsumeMode.CONCURRENTLY,
-    messageModel = MessageModel.BROADCASTING
-)
-public class AsyncConsumerMuiltChat implements RocketMQListener<String> {
+// @RocketMQMessageListener(
+//     topic = "${mq.topic.multi-chat}",
+//     consumerGroup = "${rocketmq.consumer.group}",
+//     consumeMode = ConsumeMode.CONCURRENTLY,
+//     messageModel = MessageModel.BROADCASTING
+// )
+public class AsyncConsumerMuiltChat {
     // 暂时用Map管理channel，后续使用外部缓存处理
     static final Map<Long, ChannelId> channelMap = NettyGroup.getUserMapChannel();
     static final ChannelGroup channelGroup = NettyGroup.getChannelGroup();
@@ -45,7 +46,6 @@ public class AsyncConsumerMuiltChat implements RocketMQListener<String> {
     @Autowired
     private IGroupMemberService iGroupMemberService;
 
-    @Override
     public void onMessage(String message) {
         try {
             muiltChatMsgConsume(message);
@@ -58,16 +58,17 @@ public class AsyncConsumerMuiltChat implements RocketMQListener<String> {
         ChatMsgDTO msgObj = JSON.parseObject(msg, ChatMsgDTO.class);
         // 在线，直接发送
         if (MsgTypeEnum.SEND_MSG.getType().equals(msgObj.getMsgType()) && msgObj.getGroupId() != null) {
-            // 查询群聊的用户，遍历（除了发送人）进行发送，后续可以缓存优化
-            List<GroupMemberPO> members = selectGroupMemberById(msgObj.getGroupId());
+            
             // TODO 发送用户是否有权限，进行校验
-            if (Constant.MUILT_CHAT.equals(msgObj.getChatType())) {
-                members.forEach(receiveUser -> {
-                    if (!receiveUser.getMemberId().equals(msgObj.getSendUserId())) {
+            // 在生产端已经区分了要发送的人，直接发送
+            List<Long> groupToUserIds = msgObj.getGroupToUserIds();
+            if (Constant.MUILT_CHAT.equals(msgObj.getChatType()) && CollectionUtils.isNotEmpty(groupToUserIds)) {
+                groupToUserIds.forEach(memberId -> {
+                    if (!memberId.equals(msgObj.getSendUserId())) {
                         // msgObj.setReceiveUserId(receiveUser.getId());
                         msgObj.setFriendId(Constant.SINGLE_CHAT.equals(msgObj.getChatType()) ? msgObj.getSendUserId() : msgObj.getGroupId());
                         // 在线直接发送
-                        channelMap.computeIfPresent(receiveUser.getMemberId(), (k, v) -> {
+                        channelMap.computeIfPresent(memberId, (k, v) -> {
                             Channel channel = channelGroup.find(v);
                             if (channel != null) {
                                 // 前端约定格式 msgType + "," + msgObj

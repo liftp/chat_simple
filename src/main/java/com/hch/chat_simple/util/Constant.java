@@ -23,4 +23,10 @@ public class Constant {
     // 成员在群组中的状态 正常：1 离开：0
     public static final Integer IN_GROUP = 1;
     public static final Integer LEAVE_GROUP = 0;
+
+    // redis 存储实例数量 key 
+    public static final String INST_NUM_KEY = "INST_NUM";
+
+    // redis 存储实例及映射关系key
+    public static final String INST_WITH_MAP_KEY = "INST_WITH_MAP_KEY";
 }

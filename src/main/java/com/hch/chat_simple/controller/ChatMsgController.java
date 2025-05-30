@@ -3,6 +3,7 @@ package com.hch.chat_simple.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hch.chat_simple.auth.NoAuth;
 import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
 import com.hch.chat_simple.pojo.query.GroupNotReadMsgQuery;
 import com.hch.chat_simple.pojo.vo.ChatMsgVO;

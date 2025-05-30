@@ -1,6 +1,7 @@
 package com.hch.chat_simple.pojo.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -47,5 +48,8 @@ public class ChatMsgDTO {
 
     @Schema(description = "好友id,关联前端的好友列表数据,单聊为单聊用户ID,群聊为群组id")
     private Long friendId;
+
+    @Schema(description = "群聊接收人")
+    private List<Long> groupToUserIds;
 
 }
