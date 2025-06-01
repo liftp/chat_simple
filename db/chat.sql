@@ -24,6 +24,7 @@ CREATE TABLE friend_relationship (
     friend_name VARCHAR(64) COMMENT '朋友名称',
     friend_remark VARCHAR(64) COMMENT '朋友备注',
     self_id BIGINT COMMENT '好友关系所属id',
+    created_at DATETIME COMMENT '创建时间',
     creator_id BIGINT COMMENT '创建人id',
     creator_by VARCHAR(64) COMMENT '创建人姓名',
     updated_at DATETIME COMMENT '修改时间',
