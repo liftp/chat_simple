@@ -15,6 +15,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,9 @@ public class PermisionWsHandler extends SimpleChannelInboundHandler<TextWebSocke
             FullHttpRequest request = (FullHttpRequest) msg;
             String uri = request.uri();
             log.info("ws uri: {}", uri);
+            HttpHeaders headers = request.headers();
+            String hv = headers.get("X-User-Route");
+            log.info("hv : {}", hv);
             if (StringUtils.isNotBlank(uri)) {
                 MultiValueMap<String, String> map = HttpUrlUtils.getUriParams(uri);
                 String token = map.getFirst("token");
