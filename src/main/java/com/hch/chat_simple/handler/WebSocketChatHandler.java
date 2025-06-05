@@ -91,10 +91,12 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
 
             msgObj.setMsgId(chatMsg.getId());
             if (Constant.SINGLE_CHAT.equals(msgObj.getChatType())) {
-                asyncProducerMuiltChat.asyncSend(singleChatTopic, JSON.toJSONString(msgObj));
+                // 使用新版api, 发送消息不用ws，这里暂时注释
+                // asyncProducerMuiltChat.asyncSendSingle(singleChatTopic, JSON.toJSONString(msgObj));
             } else if ((Constant.MUILT_CHAT.equals(msgObj.getChatType()))) {
+                // 使用新版api, 发送消息不用ws，这里暂时注释
                 // 群聊消息推送所有实例，进行广播
-                asyncProducerMuiltChat.asyncSend(multiChatTopic, JSON.toJSONString(msgObj));
+                // asyncProducerMuiltChat.asyncSendMulti(multiChatTopic, JSON.toJSONString(msgObj));
             }
             
         }

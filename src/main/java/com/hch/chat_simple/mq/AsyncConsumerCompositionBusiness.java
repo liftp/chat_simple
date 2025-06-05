@@ -4,10 +4,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.rocketmq.spring.annotation.ConsumeMode;
-import org.apache.rocketmq.spring.annotation.MessageModel;
-import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
-import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,19 +11,18 @@ import com.hch.chat_simple.service.ICompositionConsumeService;
 
 
 @Component
-@RocketMQMessageListener(
-    topic = "${mq.topic.composition}",
-    consumerGroup = "${rocketmq.consumer.composition}",
-    consumeMode = ConsumeMode.CONCURRENTLY,
-    messageModel = MessageModel.BROADCASTING
-)
-public class AsyncConsumerCompositionBusiness implements RocketMQListener<String> {
+// @RocketMQMessageListener(
+//     topic = "${mq.topic.composition}",
+//     consumerGroup = "${rocketmq.consumer.composition}",
+//     consumeMode = ConsumeMode.CONCURRENTLY,
+//     messageModel = MessageModel.BROADCASTING
+// )
+public class AsyncConsumerCompositionBusiness {
 
 
     @Autowired
     private List<ICompositionConsumeService> compositionService;
 
-    @Override
     public void onMessage(String message) {
         // 约定：消息类型+','+用户id(channel绑定的key)+","+消息体，这样后续直接解析类型，之后再转对应的消息内容
         int index = message.indexOf(",");

@@ -16,6 +16,7 @@ import com.hch.chat_simple.service.IUserService;
 import com.hch.chat_simple.util.BeanConvert;
 import com.hch.chat_simple.util.Constant;
 import com.hch.chat_simple.util.ContextUtil;
+import com.hch.chat_simple.util.InstanceMapTagUtils;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -122,7 +123,9 @@ public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapper, GroupInfo
         GroupInfoPO group = getById(dto.getGroupId());
         String groupJson = JSON.toJSONString(group);
         insertList.forEach(e -> {
-            asyncProducer.asyncSend(compositionTopicName, MsgTypeEnum.GROUP_MEMBER_ADD.getType() + "," + e.getMemberId() + "," + groupJson);
+            int tag = InstanceMapTagUtils.singleIdMapTag(e.getMemberId());
+            asyncProducer.asyncSend(compositionTopicName, tag + "", MsgTypeEnum.GROUP_MEMBER_ADD.getType() + "," + e.getMemberId() + "," + groupJson);
+
         });
         return true;
     }

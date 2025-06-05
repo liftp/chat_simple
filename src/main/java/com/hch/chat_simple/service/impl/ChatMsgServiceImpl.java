@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -117,7 +119,9 @@ public class ChatMsgServiceImpl extends ServiceImpl<ChatMsgMapper, ChatMsgPO> im
             if (Constant.SINGLE_CHAT.equals(msgObj.getChatType())) {
                 // 根据接收人，分成不同的tag，进行单独发送
                 int tag = InstanceMapTagUtils.singleIdMapTag(chatMsg.getReceiveUserId());
-                asyncProducerMuiltChat.asyncSend(singleChatTopic + ":" + tag, JSON.toJSONString(msgObj));
+                log.info("消息发送， topic， {}， tag: {}", singleChatTopic, tag);
+                asyncProducerMuiltChat.asyncSend(singleChatTopic, tag + "", JSON.toJSONString(msgObj));
+
             } else if ((Constant.MUILT_CHAT.equals(msgObj.getChatType()))) {
                 // 查询所有用户，根据实例分成不同的tag，分别发送
                 List<GroupMemberVO> groupMembers = iGroupInfoService.findGroupMemberById(chatMsg.getGroupId());
@@ -126,7 +130,7 @@ public class ChatMsgServiceImpl extends ServiceImpl<ChatMsgMapper, ChatMsgPO> im
                 Map<Integer, List<Long>> groupTagMap = InstanceMapTagUtils.multiGroupByTag(memberIds);
                 groupTagMap.entrySet().forEach(entry -> {
                     msgObj.setGroupToUserIds(entry.getValue());
-                    asyncProducerMuiltChat.asyncSend(multiChatTopic + ":" + entry.getKey(), JSON.toJSONString(msgObj));
+                    asyncProducerMuiltChat.asyncSend(multiChatTopic,  entry.getKey() + "", JSON.toJSONString(msgObj));
                 });
             }
             

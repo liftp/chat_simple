@@ -13,6 +13,7 @@ import com.hch.chat_simple.service.IApplyFriendService;
 import com.hch.chat_simple.service.IFriendRelationshipService;
 import com.hch.chat_simple.util.BeanConvert;
 import com.hch.chat_simple.util.ContextUtil;
+import com.hch.chat_simple.util.InstanceMapTagUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,7 +67,10 @@ public class ApplyFriendServiceImpl extends ServiceImpl<ApplyFriendMapper, Apply
         save(po);
 
         // 推送申请消息, 约定：消息类型+','+消息体，这样后续直接解析类型，之后再转对应的消息内容
-        asyncProducer.asyncSend(compositionTopicName, MsgTypeEnum.APPLY_FRIEND.getType() + "," + po.getTargetUser() + "," + JSON.toJSONString(po));
+        int tag = InstanceMapTagUtils.singleIdMapTag(po.getTargetUser());
+
+        asyncProducer.asyncSend(compositionTopicName, tag + "", MsgTypeEnum.APPLY_FRIEND.getType() + "," + po.getTargetUser() + "," + JSON.toJSONString(po));
+
         return po.getId();
     }
 
@@ -120,11 +124,15 @@ public class ApplyFriendServiceImpl extends ServiceImpl<ApplyFriendMapper, Apply
         notify.setTargetUser(userId);
 
         // 发送给申请人 申请通过消息
-        asyncProducer.asyncSend(compositionTopicName, MsgTypeEnum.APPLY_FRIEND_RESULT.getType() + "," + po.getProposerId() + "," + JSON.toJSONString(notify));
+        int tag = InstanceMapTagUtils.singleIdMapTag(po.getTargetUser());
+        asyncProducer.asyncSend(compositionTopicName, tag + "", MsgTypeEnum.APPLY_FRIEND_RESULT.getType() + "," + po.getProposerId() + "," + JSON.toJSONString(notify));
+
         // 发送给双方，添加好友关系的信息
         if (ships != null) {
             ships.forEach(s -> {
-                asyncProducer.asyncSend(compositionTopicName, MsgTypeEnum.FRIEND_SHIP_ADD.getType() + "," + s.getCreatorId() + "," + JSON.toJSONString(s));
+                int tag1 = InstanceMapTagUtils.singleIdMapTag(s.getCreatorId());
+                asyncProducer.asyncSend(compositionTopicName, tag1 + "", MsgTypeEnum.FRIEND_SHIP_ADD.getType() + "," + s.getCreatorId() + "," + JSON.toJSONString(s));
+
             });
         }
         
