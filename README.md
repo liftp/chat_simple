@@ -38,11 +38,11 @@
 
 4. 以下简单做了单聊和群聊的消息路由示例图
 
-   ![image-create](https://github.com/liftp/chat_simple/image/image-create.png)
+   ![image-create](https://github.com/liftp/chat_simple/blob/main/image/image-create.png)
 
-   ![image-send-msg](https://github.com/liftp/chat_simple/image/image-send-msg.png)
+   ![image-send-msg](https://github.com/liftp/chat_simple/blob/main/image/image-send-msg.png)
 
-   ![image-flow](https://github.com/liftp/chat_simple/image/image-flow.png)
+   ![image-flow](https://github.com/liftp/chat_simple/blob/main/image/image-flow.png)
 
 3.3 针对消息存储，及未读消息做了以下处理
 
