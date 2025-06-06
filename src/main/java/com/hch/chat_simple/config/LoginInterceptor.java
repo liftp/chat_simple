@@ -2,6 +2,8 @@ package com.hch.chat_simple.config;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController;
 import org.springframework.web.method.HandlerMethod;
@@ -9,6 +11,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.hch.chat_simple.auth.NoAuth;
 import com.hch.chat_simple.pojo.dto.TokenInfoDTO;
@@ -42,13 +45,29 @@ public class LoginInterceptor implements HandlerInterceptor {
 
                 if (StringUtils.isNotBlank(token)) {
                     DecodedJWT decodeJwt = null;
-                    if ((decodeJwt = TokenUtil.verigyToken(token)) != null) {
+                    if ((decodeJwt = TokenUtil.verifyToken(token)) != null) {
+                        Date expiresAt = decodeJwt.getExpiresAt();
+                        
                         // 根据token 设置上线文用户信息, 其他信息可以从request.getCookies()设置
                         String subject = decodeJwt.getSubject();
                         TokenInfoDTO tokenInfo = JSON.parseObject(subject, TokenInfoDTO.class);
+                        // 过期创建新的token，走aspect拦截返回newToken
+                        if (expiresAt.compareTo(new Date()) < 0) {
+                            TokenInfoDTO tokeInfo = TokenInfoDTO.builder()
+                                    .username(tokenInfo.getUsername())
+                                    .userId(tokenInfo.getUserId())
+                                    .realName(tokenInfo.getRealName())
+                                    .build();
+                
+                            String tokenGen = JSON.toJSONString(tokeInfo);
+                            String continueToken = TokenUtil.createToken(tokenGen);
+                            ContextUtil.setNewToken(continueToken);
+                            throw new TokenExpiredException("token 失效", null);
+                        }
                         ContextUtil.setUserId(tokenInfo.getUserId());
                         ContextUtil.setUsername(tokenInfo.getUsername());
                         ContextUtil.setRealName(tokenInfo.getRealName());
+                        
                         return true;
                     } else {
 

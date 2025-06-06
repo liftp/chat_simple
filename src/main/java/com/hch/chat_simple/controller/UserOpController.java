@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import com.hch.chat_simple.auth.NoAuth;
+import com.hch.chat_simple.pojo.dto.AddUserForm;
 import com.hch.chat_simple.pojo.dto.TokenInfoDTO;
 import com.hch.chat_simple.pojo.dto.UserLoginDTO;
 import com.hch.chat_simple.pojo.po.UserPO;
@@ -100,6 +101,12 @@ public class UserOpController {
     @Operation(description = "搜索用户")
     public Payload<List<UserVO>> searchUser(@Valid @RequestBody UserQuery query) {
         return Payload.success(iUserService.searchUserByName(query));
+    }
+
+    @PostMapping("/insertUser")
+    @Operation(description = "添加用户")
+    public Payload<Boolean> insertUser(@Valid @RequestBody AddUserForm form) {
+        return Payload.success(iUserService.insertUser(form));
     }
 
 }

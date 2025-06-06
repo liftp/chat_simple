@@ -3,6 +3,7 @@ package com.hch.chat_simple.service.impl;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hch.chat_simple.mapper.UserMapper;
+import com.hch.chat_simple.pojo.dto.AddUserForm;
 import com.hch.chat_simple.pojo.po.UserPO;
 import com.hch.chat_simple.pojo.query.UserQuery;
 import com.hch.chat_simple.pojo.vo.UserVO;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -43,6 +45,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserPO> implements 
             return new ArrayList<>();
         }
         return BeanConvert.convert(userList, UserVO.class);
+    }
+
+    @Override
+    public Boolean insertUser(AddUserForm form) {
+        UserPO userPO = BeanConvert.convertSingle(form, UserPO.class);
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String pwd = passwordEncoder.encode(userPO.getPassword());
+        userPO.setPassword(pwd);
+        save(userPO);
+        return true;
     }
 
 }
