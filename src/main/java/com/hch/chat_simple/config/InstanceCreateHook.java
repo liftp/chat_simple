@@ -14,9 +14,12 @@ import com.hch.chat_simple.util.RedisUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * tag映射直接走配置，就不用动态hook了
+ */
 @Slf4j
-@Configuration
-@AutoConfigureAfter(RedisUtil.class)
+// @Configuration
+// @AutoConfigureAfter(RedisUtil.class)
 public class InstanceCreateHook {
     
     @Autowired

@@ -16,6 +16,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 import com.hch.chat_simple.config.InstanceCreateHook;
 import com.hch.chat_simple.util.Constant;
@@ -27,8 +28,8 @@ import lombok.extern.slf4j.Slf4j;
  * 这里的消费者订阅在实例信息注入后处理，这样能获取到实例信息，作为tag进行路由
  */
 @Slf4j
-@Configuration
-@AutoConfigureAfter(InstanceCreateHook.class)
+@Component
+// @AutoConfigureAfter(InstanceCreateHook.class)
 public class AsyncConsumerDynamicTag {
 
     @Value("${mq.topic.multi-chat}")
@@ -64,6 +65,12 @@ public class AsyncConsumerDynamicTag {
     @Autowired
     private AsyncConsumerCompositionBusiness asyncConsumerCompositionBusiness;
 
+    @Value("${chat.tag.list}")
+    private String tagListStr;
+
+    @Value("${chat.tag.local}")
+    private Boolean tagLocal;
+
     /**
      * 群聊消费
      * @return
@@ -72,8 +79,20 @@ public class AsyncConsumerDynamicTag {
     @Bean
     public DefaultMQPushConsumer defaultMultiChatPushConsumer() throws Throwable {
         // 拉取本机的实例ip+port对应的映射实例数量，作为tag
-        String mapValue = RedisUtil.mapGet(Constant.INST_WITH_MAP_KEY, getHost() + ":" + getPort());
-        log.info("实例信息：{}, 映射tag: {}",  getHost() + ":" + getPort(), mapValue);
+        // String mapValue = RedisUtil.mapGet(Constant.INST_WITH_MAP_KEY, getHost() + ":" + getPort());
+        // 本来应该使用getHost匹配tagList,本地测试直接使用127.0.0.1
+        int i = 1;
+        String instance = (tagLocal ? "127.0.0.1" : getHost()) + ":" + getPort();
+        String[] tagList = tagListStr.split(",");
+        for (String tagConfig : tagList) {
+            if (instance.equals(tagConfig.trim())) {
+                break;
+            }
+            i++;
+        }
+        String mapValue = i + "";
+
+        log.info("实例信息：{}, 映射tag: {}",  instance, mapValue);
         // 相同消费组的 订阅关系 + 消费逻辑必须保持一致，所以只能根据不同组去消费不同的订阅关系，
         // 这里的消费关系是：(不同的组消费 --- 相同的topic + 不同的tag)
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(multiGroup + mapValue);
@@ -107,7 +126,16 @@ public class AsyncConsumerDynamicTag {
     @Bean
     public DefaultMQPushConsumer defaultSingleChatPushConsumer() throws Throwable {
         // 拉取本机的实例ip+port对应的映射实例数量，作为tag
-        String mapValue = RedisUtil.mapGet(Constant.INST_WITH_MAP_KEY, getHost() + ":" + getPort());
+        int i = 1;
+        String instance = (tagLocal ? "127.0.0.1" : getHost()) + ":" + getPort();
+        String[] tagList = tagListStr.split(",");
+        for (String tagConfig : tagList) {
+            if (instance.equals(tagConfig.trim())) {
+                break;
+            }
+            i++;
+        }
+        String mapValue = i + "";
         log.info("实例信息：{}, 映射tag: {}",  getHost() + ":" + getPort(), mapValue);
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(singleGroup + mapValue);
         consumer.setNamesrvAddr(namerServer);
@@ -133,7 +161,16 @@ public class AsyncConsumerDynamicTag {
     @Bean
     public DefaultMQPushConsumer defaulCompositionNotifyPushConsumer() throws Throwable {
         // 拉取本机的实例ip+port对应的映射实例数量，作为tag
-        String mapValue = RedisUtil.mapGet(Constant.INST_WITH_MAP_KEY, getHost() + ":" + getPort());
+        int i = 1;
+        String instance = (tagLocal ? "127.0.0.1" : getHost()) + ":" + getPort();
+        String[] tagList = tagListStr.split(",");
+        for (String tagConfig : tagList) {
+            if (instance.equals(tagConfig.trim())) {
+                break;
+            }
+            i++;
+        }
+        String mapValue = i + "";
         log.info("实例信息：{}, 映射tag: {}",  getHost() + ":" + getPort(), mapValue);
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(compositionGroup + mapValue);
         consumer.setNamesrvAddr(namerServer);
