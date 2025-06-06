@@ -108,6 +108,7 @@ public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapper, GroupInfo
         // 查询group已有的成员，添加时过滤
         List<GroupMemberVO> havedMembers = findGroupMemberById(dto.getGroupId());
         Set<Long> memberIdsFilter = havedMembers.stream().map(e -> e.getMemberId()).collect(Collectors.toSet());
+        Long currentUserId = ContextUtil.getUserId();
         List<GroupMemberPO> insertList = dto.getUserIds().stream()
             .filter(e -> !memberIdsFilter.contains(e))
             .map(e -> {
@@ -115,6 +116,8 @@ public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapper, GroupInfo
                 po.setMemberId(e);
                 po.setGroupId(dto.getGroupId());
                 po.setMemberName(userIdMap.get(e).getUsername());
+                po.setMemberRemark(userIdMap.get(e).getName());
+                po.setInviteId(currentUserId);
                 return po;
             }).collect(Collectors.toList());
         // 添加的成员进行通知
@@ -122,11 +125,18 @@ public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapper, GroupInfo
         // find group by id 
         GroupInfoPO group = getById(dto.getGroupId());
         String groupJson = JSON.toJSONString(group);
+        // 通知添加人，进入新群
         insertList.forEach(e -> {
             int tag = InstanceMapTagUtils.singleIdMapTag(e.getMemberId());
             asyncProducer.asyncSend(compositionTopicName, tag + "", MsgTypeEnum.GROUP_MEMBER_ADD.getType() + "," + e.getMemberId() + "," + groupJson);
 
         });
+        // 通知老成员人，有新人加入，更新成员信息
+        memberIdsFilter.forEach(old -> {
+            int tag = InstanceMapTagUtils.singleIdMapTag(old);
+            asyncProducer.asyncSend(compositionTopicName, tag + "", MsgTypeEnum.GROUP_MEMBER_TO_UPDATE.getType() + "," + old + "," + groupJson);
+        });
+
         return true;
     }
 }
