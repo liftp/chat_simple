@@ -1,5 +1,6 @@
 package com.hch.chat_simple.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hch.chat_simple.mapper.UserMapper;
@@ -49,6 +50,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserPO> implements 
 
     @Override
     public Boolean insertUser(AddUserForm form) {
+        // 校验添加用户登录名是否存在
+        Wrapper<UserPO> query = Wrappers.<UserPO>query().lambda()
+            .eq(UserPO::getUsername, form.getUsername());
+        long count =  this.count(query);
+        if (count > 0) {
+            throw new RuntimeException("登录名已存在");
+        }
         UserPO userPO = BeanConvert.convertSingle(form, UserPO.class);
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String pwd = passwordEncoder.encode(userPO.getPassword());

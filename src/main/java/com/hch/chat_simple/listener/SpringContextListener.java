@@ -16,7 +16,7 @@ import com.hch.chat_simple.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Component
+// @Component
 public class SpringContextListener {
 
     @Autowired

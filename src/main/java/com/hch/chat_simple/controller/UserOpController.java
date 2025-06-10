@@ -103,6 +103,7 @@ public class UserOpController {
         return Payload.success(iUserService.searchUserByName(query));
     }
 
+    @NoAuth
     @PostMapping("/insertUser")
     @Operation(description = "添加用户")
     public Payload<Boolean> insertUser(@Valid @RequestBody AddUserForm form) {
