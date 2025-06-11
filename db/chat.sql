@@ -105,7 +105,7 @@ CREATE TABLE apply_friend (
 	modifier_id BIGINT COMMENT '修改人id',
 	modifier_by VARCHAR(64) COMMENT '修改人姓名',
 	dr TINYINT(1) COMMENT '是否删除 0:未删除 1:已删除'
-) COMMENT '好友申请记录'
+) COMMENT '好友申请记录';
 
 
 CREATE TABLE `notify_msg`  (

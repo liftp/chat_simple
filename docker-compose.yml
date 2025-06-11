@@ -1,18 +1,20 @@
 version: '3'
 services:
-  chatsimple:
-    image: chat/chat_simple:latest
-    ports:
-      - "9001:9001"
-    depends_on:
-      - db
-      - redis
-      - broker
+  # chatsimple:
+  #   image: chat/chat_simple:latest
+  #   ports:
+  #     - "9001:9001"
+  #   depends_on:
+  #     - db
+  #     - redis
+  #     - broker
   db:
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: chat
+    volumes: 
+      - ./db/chat.sql/:/docker-entrypoint-initdb.d/init.sql
     ports: 
       - "3306:3306"
   redis: 
@@ -20,29 +22,27 @@ services:
     container_name: chat-redis
     ports:
       - "6379:6379"
-    volumns:
-      - redis-data:/data
+    volumes:
+      - redis-data:/data/redis
     restart: always
   namesrv:
-    images: rocketmqinc/rocketmq:5.0.0
+    image: apache/rocketmq:5.0.0
     container_name: rmqnamesrv
     ports:
       - 9876:9876
     command: sh mqnamesrv
   broker:
-    image: rocketmqinc/rocketmq:5.0.0
+    image: apache/rocketmq:5.0.0
     ports:
       - 10909:10909
       - 10911:10911
-    volumes:
-      - ./data/broker:/opt/rocketmq-4.9.0/store
     environment:
       NAMESRV_ADDR: namesrv:9876
     depends_on:
       - namesrv
-    command: sh mqbroker -n namesrcv:9876 -c /opt/rocketmq-4.9.0/conf/2m-noslave/broker-a.properties
+    command: sh mqbroker -n namesrcv:9876 
 
-volumns:
-  redis-data: /data/redis
+volumes:
+  redis-data: 
 
     
