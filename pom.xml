@@ -344,6 +344,24 @@
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+				<version>1.4.13</version> <!-- 使用最新版本 -->
+				<executions>
+					<execution>
+						<id>build-image</id>
+						<goals>
+							<goal>build</goal>
+							<goal>push</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<repository>chat/chat_simple</repository>
+					<tag>0.0.1-SNAPSHOT</tag>
+				</configuration>
+			</plugin>
 
 		</plugins>
 	</build>
