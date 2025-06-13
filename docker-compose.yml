@@ -3,7 +3,7 @@ services:
   openresty:
     image: openresty/openresty
     volumes: 
-      - ./openresty_nginx_conf/nginx.conf:/home/docker/openresty/nginx/conf/nginx.conf
+      - ./openresty_nginx_conf/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf
     ports: 
       - "8001:80"
     depends_on:
