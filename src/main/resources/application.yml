@@ -77,6 +77,6 @@ chat:
   server:
     port: 7891
   tag:
-    list: 127.0.0.1:9001, 127.0.0.1:9002, 127.0.0.1:9003
-    # 本地直接设置用127.0.0.1:端口匹配，否则tag.list需要动态配置网络ip
+    list: chat_a, chat_b, chat_c
     local: true 
+    current: chat_a # 这个配置为了找chat.tag.list中的位置设置为tag,用来取模mq tag
