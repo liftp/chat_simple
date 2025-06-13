@@ -52,23 +52,37 @@
 
 4.1. 见项目chat.sql
 
-#### 5. 存在缺陷
+#### 5.后端部署
 
-5.1 缺少头像展示
+```shell
+# 先编译项目, 前置需要了jdk17 maven环境,再项目根目录下
+maven install -DskipTests
+# 使用Dockerfile构建
+docker build -t chat/chat_simple:1.0.0 .
+# 注意项目下的openresty_nginx_conf/nginx.conf, 修改ws代理路径为，docker宿主容器的ip，这样就可以直接运行docker compose
+# 直接使用docker compose 启动,后面加-d参数，后台运行
+docker compose up 
+# 启动完成后，前端项目运行，需要修改对应vite的代理请求路径
+```
 
-5.2 暂未增加通知类消息推送（如群聊成员添加消息推送及展示）
 
-5.3 暂未实现压力测试，只是基于设计思想进行了实现
 
-#### 6. 后续可能追加实现
+#### 6. 存在缺陷
 
-6.1 文件传输； 语音发送；安卓端聊天支持（可能使用react native）实现
+6.1 缺少头像展示， 缺少用户添加，及个人备注修改功能
 
-#### 7. 前端框架
+6.2 暂未增加通知类消息推送（如群聊成员添加消息推送及展示）
 
-7.1 前端使用electron + vue3 + nedb 等实现桌面端应用，windows作为开发系统，mac 系统暂未测试，具体前端项目详见：
+6.3 暂未实现压力测试，只是基于设计思想进行了实现
+
+#### 7. 后续可能追加实现
+
+7.1 文件传输； 语音发送；安卓端聊天支持（可能使用react native）实现
+
+#### 8. 前端框架
+
+8.1 前端使用electron + vue3 + nedb 等实现桌面端应用，windows作为开发系统，mac 系统暂未测试，具体前端项目详见：
 
 [基于electron + vue3 + nedb的前端聊天]: https://github.com/liftp/chat_front
-
 
 
