@@ -84,7 +84,7 @@ public class AsyncConsumerDynamicTag {
         // 拉取本机的实例ip+port对应的映射实例数量，作为tag
         // String mapValue = RedisUtil.mapGet(Constant.INST_WITH_MAP_KEY, getHost() + ":" + getPort());
         // 本来应该使用currentTag匹配tagList，在那个索引上，直接设置tag
-        int i = 1;
+        int i = 0;
         String instance = currentTag;
         String[] tagList = tagListStr.split(",");
         for (String tagConfig : tagList) {

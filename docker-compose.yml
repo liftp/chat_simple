@@ -19,8 +19,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/chat?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
-      - CHAT_TAG_LIST=$HOST_IP:9001,$HOST_IP:9002,$HOST_IP:9003
-      - CHAT_TAG_LOCAL=false
+      - CHAT_TAG_CURRENT=chat_a
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db
@@ -35,8 +34,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/chat?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
-      - CHAT_TAG_LIST=$HOST_IP:9001,$HOST_IP:9002,$HOST_IP:9003
-      - CHAT_TAG_LOCAL=false
+      - CHAT_TAG_CURRENT=chat_b
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db
@@ -51,8 +49,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/chat?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
-      - CHAT_TAG_LIST=$HOST_IP:9001,$HOST_IP:9002,$HOST_IP:9003
-      - CHAT_TAG_LOCAL=false
+      - CHAT_TAG_CURRENT=chat_c
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db
