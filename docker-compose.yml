@@ -1,13 +1,57 @@
 version: '3'
 services:
-  # chatsimple:
-  #   image: chat/chat_simple:latest
-  #   ports:
-  #     - "9001:9001"
-  #   depends_on:
-  #     - db
-  #     - redis
-  #     - broker
+  openresty:
+    image: openresty/openresty
+    volumes: 
+      - ./openresty_nginx_conf/nginx.conf:/home/docker/openresty/nginx/conf/nginx.conf
+    ports: 
+      - "8001:80"
+    depends_on:
+      - chatsimple_1
+      - chatsimple_2
+      - chatsimple_3
+  chatsimple_1:
+    image: chat/chat_simple:latest
+    ports:
+      - "9001:9001"
+      - "7891:7891"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/chat?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_DATA_REDIS_HOST=redis
+      - ROCKETMQ_NAME-SERVER=namesrv:9876
+    depends_on:
+      - db
+      - redis
+      - broker
+  chatsimple_2:
+    image: chat/chat_simple:latest
+    ports:
+      - "9002:9002"
+      - "7892:7892"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/chat?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_DATA_REDIS_HOST=redis
+      - ROCKETMQ_NAME-SERVER=namesrv:9876
+    depends_on:
+      - db
+      - redis
+      - broker
+  chatsimple_3:
+    image: chat/chat_simple:latest
+    ports:
+      - "9003:9003"
+      - "7893:7893"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/chat?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true
+      - SPRING_DATASOURCE_PASSWORD=root
+      - SPRING_DATA_REDIS_HOST=redis
+      - ROCKETMQ_NAME-SERVER=namesrv:9876
+    depends_on:
+      - db
+      - redis
+      - broker
   db:
     image: mysql:5.7
     environment:
