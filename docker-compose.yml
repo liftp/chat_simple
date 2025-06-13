@@ -19,6 +19,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/chat?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
+      - CHAT_TAG_LIST=$HOST_IP:9001,$HOST_IP:9002,$HOST_IP:9003
+      - CHAT_TAG_LOCAL=false
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db
@@ -27,12 +29,14 @@ services:
   chatsimple_2:
     image: chat/chat_simple:latest
     ports:
-      - "9002:9002"
-      - "7892:7892"
+      - "9002:9001"
+      - "7892:7891"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/chat?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
+      - CHAT_TAG_LIST=$HOST_IP:9001,$HOST_IP:9002,$HOST_IP:9003
+      - CHAT_TAG_LOCAL=false
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db
@@ -41,12 +45,14 @@ services:
   chatsimple_3:
     image: chat/chat_simple:latest
     ports:
-      - "9003:9003"
-      - "7893:7893"
+      - "9003:9001"
+      - "7893:7891"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/chat?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&rewriteBatchedStatements=true
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
+      - CHAT_TAG_LIST=$HOST_IP:9001,$HOST_IP:9002,$HOST_IP:9003
+      - CHAT_TAG_LOCAL=false
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db

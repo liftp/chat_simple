@@ -92,7 +92,7 @@ CREATE TABLE group_member (
 CREATE TABLE apply_friend (  
 	id bigint NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
 	proposer_id BIGINT COMMENT '申请人id',
-	proposer_name BIGINT COMMENT '申请人名称',
+	proposer_name VARCHAR(64) COMMENT '申请人名称',
 	proposer_remark VARCHAR(64) COMMENT '申请人备注',
 	proposer_reason VARCHAR(64) COMMENT '申请理由',
 	target_user BIGINT COMMENT '被申请好友id', 
@@ -118,6 +118,6 @@ CREATE TABLE `notify_msg`  (
     updated_at DATETIME COMMENT '修改时间',
     modifier_id BIGINT COMMENT '修改人id',
     modifier_by VARCHAR(64) COMMENT '修改人姓名',
-    dr TINYINT(1) COMMENT '是否删除 0:未删除 1:已删除'
+    dr TINYINT(1) COMMENT '是否删除 0:未删除 1:已删除',
     PRIMARY KEY (`id`)
 ) COMMENT = '通知类型消息';
