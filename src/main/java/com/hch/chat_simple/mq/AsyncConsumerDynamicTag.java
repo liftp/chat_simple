@@ -84,7 +84,7 @@ public class AsyncConsumerDynamicTag {
         // 拉取本机的实例ip+port对应的映射实例数量，作为tag
         // String mapValue = RedisUtil.mapGet(Constant.INST_WITH_MAP_KEY, getHost() + ":" + getPort());
         // 本来应该使用currentTag匹配tagList，在那个索引上，直接设置tag
-        int i = 0;
+        int i = 1;
         String instance = currentTag;
         String[] tagList = tagListStr.split(",");
         for (String tagConfig : tagList) {
@@ -130,7 +130,7 @@ public class AsyncConsumerDynamicTag {
     public DefaultMQPushConsumer defaultSingleChatPushConsumer() throws Throwable {
         // 拉取本机的实例ip+port对应的映射实例数量，作为tag
         int i = 1;
-        String instance = (tagLocal ? "127.0.0.1" : getHost()) + ":" + getPort();
+        String instance = currentTag;
         String[] tagList = tagListStr.split(",");
         for (String tagConfig : tagList) {
             if (instance.equals(tagConfig.trim())) {
@@ -139,7 +139,8 @@ public class AsyncConsumerDynamicTag {
             i++;
         }
         String mapValue = i + "";
-        log.info("实例信息：{}, 映射tag: {}",  getHost() + ":" + getPort(), mapValue);
+
+        log.info("实例信息：{}, 映射tag: {}",  instance, mapValue);
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(singleGroup + mapValue);
         consumer.setNamesrvAddr(namerServer);
         consumer.subscribe(singleTopic, mapValue.trim());
@@ -165,7 +166,7 @@ public class AsyncConsumerDynamicTag {
     public DefaultMQPushConsumer defaulCompositionNotifyPushConsumer() throws Throwable {
         // 拉取本机的实例ip+port对应的映射实例数量，作为tag
         int i = 1;
-        String instance = (tagLocal ? "127.0.0.1" : getHost()) + ":" + getPort();
+        String instance = currentTag;
         String[] tagList = tagListStr.split(",");
         for (String tagConfig : tagList) {
             if (instance.equals(tagConfig.trim())) {
@@ -174,7 +175,8 @@ public class AsyncConsumerDynamicTag {
             i++;
         }
         String mapValue = i + "";
-        log.info("实例信息：{}, 映射tag: {}",  getHost() + ":" + getPort(), mapValue);
+
+        log.info("实例信息：{}, 映射tag: {}",  instance, mapValue);
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(compositionGroup + mapValue);
         consumer.setNamesrvAddr(namerServer);
         consumer.subscribe(compositionTopic, mapValue.trim());
