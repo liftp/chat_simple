@@ -58,8 +58,8 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
     @Resource
     private IChatMsgService iChatMsgService;
 
-    @Resource
-    private SnowflakeIdGen snowflakeIdGen;
+    // @Resource
+    // private SnowflakeIdGen snowflakeIdGen;
 
     @Autowired
     private AsyncProducer asyncProducerMuiltChat;

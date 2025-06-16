@@ -8,13 +8,13 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Configuration
+// @Configuration
 public class SnowflakeFactory {
 
-    @Autowired
+    // @Autowired
     private StringRedisTemplate redisTemplate;
 
-    @Bean
+    // @Bean
     public SnowflakeIdGen snowflakeIdGen() {
         long workerId = redisTemplate.opsForValue().increment("snowflake:idGen:incr");
         log.info("This instance snowflake worderId is {}", workerId);
