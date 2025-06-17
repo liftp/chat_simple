@@ -39,6 +39,11 @@ import io.netty.util.AttributeKey;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 客户端向服务器发消息，已改为http发送，所以这里的channelRead0实际不会触发
+ * 服务器向客户端发消息，还是netty接管，因为用netty管理了websocket会话，
+ * 在userEventTriggered事件进行身份认证，及会话添加
+ */
 @Slf4j
 @Component
 @Sharable
