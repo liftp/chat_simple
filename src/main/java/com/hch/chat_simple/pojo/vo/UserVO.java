@@ -37,4 +37,7 @@ public class UserVO {
     @Schema(description = "真实姓名")
     private String name;
 
+    @Schema(description = "是否好友关系 true: 是 false: 非")
+    private Boolean friendRelation;
+
 }
