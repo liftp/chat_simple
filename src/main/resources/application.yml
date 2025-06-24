@@ -83,7 +83,7 @@ chat:
 
 minio:
   accessKey: minio
-  secretKey: minio
+  secretKey: minio123
   bucketName: chat
   secure: false
   url: http://localhost:9000/
