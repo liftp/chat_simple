@@ -80,3 +80,10 @@ chat:
     list: chat_a, chat_b, chat_c
     local: true 
     current: chat_a # 这个配置为了找chat.tag.list中的位置设置为tag,用来取模mq tag
+
+minio:
+  accessKey: minio
+  secretKey: minio
+  bucketName: chat
+  secure: false
+  url: http://localhost:9000/

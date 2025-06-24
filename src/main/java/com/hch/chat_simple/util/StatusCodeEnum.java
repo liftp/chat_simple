@@ -9,7 +9,8 @@ public enum StatusCodeEnum {
     TOKEN_LACK(506, "token缺失"),
     TOKEN_EXPIRE(507, "token 已失效"),
     USER_NOT_FOUND(508, "用户不存在"),
-    PWD_ERROR(509, "密码错误");
+    PWD_ERROR(509, "密码错误"),
+    FILE_UPLOAD_FAIL(510, "文件上传失败");
     private int code;
     private String desc;
 

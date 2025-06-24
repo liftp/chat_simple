@@ -20,11 +20,13 @@ services:
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
       - CHAT_TAG_CURRENT=chat_a
+      - MINIO_URL=http://$HOST_IP:10000/
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db
       - redis
       - broker
+      - minio
   chatsimple_2:
     image: chat/chat_simple:latest
     ports:
@@ -35,11 +37,13 @@ services:
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
       - CHAT_TAG_CURRENT=chat_b
+      - MINIO_URL=http://$HOST_IP:10000/
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db
       - redis
       - broker
+      - minio
   chatsimple_3:
     image: chat/chat_simple:latest
     ports:
@@ -50,11 +54,13 @@ services:
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
       - CHAT_TAG_CURRENT=chat_c
+      - MINIO_URL=http://$HOST_IP:10000/
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db
       - redis
       - broker
+      - minio
   db:
     image: mysql:5.7
     environment:
@@ -88,6 +94,15 @@ services:
     depends_on:
       - namesrv
     command: sh mqbroker -n namesrcv:9876 
+  minio:
+    image: minio/minio
+    container_name: minio
+    ports: 
+      - 10000:9000
+      - 10001:9001
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=minio
 
 volumes:
   redis-data: 
