@@ -11,7 +11,7 @@ services:
       - chatsimple_2
       - chatsimple_3
   chatsimple_1:
-    image: chat/chat_simple:latest
+    image: chat/chat_simple:1.0.0
     ports:
       - "9001:9001"
       - "7891:7891"
@@ -28,7 +28,7 @@ services:
       - broker
       - minio
   chatsimple_2:
-    image: chat/chat_simple:latest
+    image: chat/chat_simple:1.0.0
     ports:
       - "9002:9001"
       - "7892:7891"
@@ -45,7 +45,7 @@ services:
       - broker
       - minio
   chatsimple_3:
-    image: chat/chat_simple:latest
+    image: chat/chat_simple:1.0.0
     ports:
       - "9003:9001"
       - "7893:7891"
