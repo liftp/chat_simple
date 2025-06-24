@@ -120,7 +120,7 @@ services:
     entrypoint: >
       /bin/sh -c "
       sleep 10;
-      /usr/bin/mc config host add myminio http://minio:9000 minio minio123;
+      /usr/bin/mc alias set myminio http://minio:9000 minio minio123;
       /usr/bin/mc mb myminio/chat;
       /usr/bin/mc anonymous set download myminio/chat;
       exit 0;
