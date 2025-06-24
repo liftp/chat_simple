@@ -20,7 +20,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
       - CHAT_TAG_CURRENT=chat_a
-      - MINIO_URL=http://$HOST_IP:10000/
+      - MINIO_URL=http://minio:9000/
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db
@@ -37,7 +37,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
       - CHAT_TAG_CURRENT=chat_b
-      - MINIO_URL=http://$HOST_IP:10000/
+      - MINIO_URL=http://minio:9000/
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db
@@ -54,7 +54,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=root
       - SPRING_DATA_REDIS_HOST=redis
       - CHAT_TAG_CURRENT=chat_c
-      - MINIO_URL=http://$HOST_IP:10000/
+      - MINIO_URL=http://minio:9000/
       - ROCKETMQ_NAME-SERVER=namesrv:9876
     depends_on:
       - db
@@ -76,7 +76,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - redis-data:/data/redis
+      - redis-data:/data
     restart: always
   namesrv:
     image: apache/rocketmq:5.0.0
