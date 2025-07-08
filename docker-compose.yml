@@ -93,7 +93,7 @@ services:
       NAMESRV_ADDR: namesrv:9876
     depends_on:
       - namesrv
-    command: sh mqbroker -n namesrcv:9876 
+    command: sh mqbroker -n namesrv:9876 
   minio:
     image: minio/minio
     container_name: minio
