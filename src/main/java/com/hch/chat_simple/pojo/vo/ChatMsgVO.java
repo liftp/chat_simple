@@ -52,4 +52,7 @@ public class ChatMsgVO {
     @Schema(description = "根据创建时间生成的时间戳")
     private Long dateTime;
 
+    @Schema(description = "消息内容类型 1: 文本 2: 语音")
+    private Integer contentType;
+
 }

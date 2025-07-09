@@ -44,5 +44,8 @@ public class ChatMsgPO extends BasePO {
     @Schema(description = "消息发送状态 0:失败 1:成功")
     private Integer status;
 
+    @Schema(description = "消息内容类型 1: 文本 2: 语音")
+    private Integer contentType;
+
 
 }

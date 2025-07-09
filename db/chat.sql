@@ -121,3 +121,7 @@ CREATE TABLE `notify_msg`  (
     dr TINYINT(1) COMMENT '是否删除 0:未删除 1:已删除',
     PRIMARY KEY (`id`)
 ) COMMENT = '通知类型消息';
+
+-- 补充字段 消息类型字段
+ALTER TABLE `chat`.`chat_msg` 
+ADD COLUMN `content_type` tinyint(1) NULL DEFAULT 1 COMMENT '消息内容类型 1: 文本 2: 语音' AFTER `dr`;
