@@ -125,3 +125,6 @@ CREATE TABLE `notify_msg`  (
 -- 补充字段 消息类型字段
 ALTER TABLE `chat`.`chat_msg` 
 ADD COLUMN `content_type` tinyint(1) NULL DEFAULT 1 COMMENT '消息内容类型 1: 文本 2: 语音' AFTER `dr`;
+
+ALTER TABLE `chat`.`chat_msg` 
+ADD COLUMN `content_len` int(8) NULL COMMENT '内容长度' AFTER `content_type`;

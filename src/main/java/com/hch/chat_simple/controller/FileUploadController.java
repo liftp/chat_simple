@@ -51,7 +51,7 @@ public class FileUploadController {
     public Payload upload(@RequestParam("file") MultipartFile file) {
         String objectName = minIOUtil.upload(file);
         if (objectName != null) {
-            return Payload.success(minioConfig.getUrl() + "/" + minioConfig.getBucketName() + "/" + objectName);
+            return Payload.success(minioConfig.getViewUrl() + "/" + minioConfig.getBucketName() + "/" + objectName);
         }
         return Payload.of("上传失败", StatusCodeEnum.FILE_UPLOAD_FAIL);
     }
@@ -62,9 +62,9 @@ public class FileUploadController {
     }
 
     @GetMapping("/download")
-    public Payload download(@RequestParam String fileName, HttpServletResponse response) {
+    public void download(@RequestParam String fileName, HttpServletResponse response) {
         minIOUtil.download(fileName, response);
-        return Payload.success("下载成功");
+        // return Payload.success("下载成功");
     }
 
     @GetMapping("/remove")

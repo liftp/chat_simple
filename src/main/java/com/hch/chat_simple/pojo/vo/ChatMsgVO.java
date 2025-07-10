@@ -55,4 +55,7 @@ public class ChatMsgVO {
     @Schema(description = "消息内容类型 1: 文本 2: 语音")
     private Integer contentType;
 
+    @Schema(description = "内容长度")
+    private Integer contentLen;
+
 }

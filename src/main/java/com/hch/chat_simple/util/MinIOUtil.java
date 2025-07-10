@@ -158,7 +158,7 @@ public class MinIOUtil {
                 }
             }
         } catch (Exception e) {
-            log.info("download exception: ", e);
+            log.error("download exception: ", e);
         }
     }
 

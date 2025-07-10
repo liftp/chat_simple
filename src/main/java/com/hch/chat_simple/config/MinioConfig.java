@@ -20,6 +20,11 @@ public class MinioConfig {
 
     private String bucketName;
 
+    /**
+     * 用于访问的外部暴露url
+     */
+    private String viewUrl;
+
     @Bean
     public MinioClient getMinioClient() {
         return MinioClient.builder().endpoint(url).credentials(accessKey, secretKey).build();
