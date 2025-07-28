@@ -17,9 +17,9 @@ import com.hch.chat_simple.pojo.vo.ApplyFriendVO;
  */
 public interface IApplyFriendService extends IService<ApplyFriendPO> {
 
-    Long applyFriend(ApplyFriendDTO applyFriend);
+    ApplyFriendVO applyFriend(ApplyFriendDTO applyFriend);
 
-    List<ApplyFriendVO> applyList(Long dataId);
+    List<ApplyFriendVO> applyList(Long updateLast);
 
-    Long applyFriendConfirm(ApplyFriendDTO applyFriend);
+    ApplyFriendVO applyFriendConfirm(ApplyFriendDTO applyFriend);
 }

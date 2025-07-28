@@ -34,21 +34,21 @@ public class ApplyFriendController {
 
     @PostMapping("applyRecord")
     @Operation(description = "好友申请记录列表")
-    public Payload<List<ApplyFriendVO>> applyRecord(@RequestParam(required = false) Long dataId) {
-        return Payload.success(iAppFriendService.applyList(dataId));
+    public Payload<List<ApplyFriendVO>> applyRecord(@RequestParam(required = false) Long updateLast) {
+        return Payload.success(iAppFriendService.applyList(updateLast));
     }
 
     @PostMapping("applyFriend")
     @Operation(description = "好友申请")
-    public Payload<Long> applyFriend(@Valid @RequestBody ApplyFriendDTO dto) {
+    public Payload<ApplyFriendVO> applyFriend(@Valid @RequestBody ApplyFriendDTO dto) {
         return Payload.success(iAppFriendService.applyFriend(dto));
     }
 
     @PostMapping("applyFriendConfirm")
     @Operation(description = "好友申请确认")
-    public Payload<Long> applyFriendConfirm(@Valid @RequestBody ApplyFriendDTO dto) {
+    public Payload<ApplyFriendVO> applyFriendConfirm(@Valid @RequestBody ApplyFriendDTO dto) {
         return Payload.success(iAppFriendService.applyFriendConfirm(dto));
     }
 
-    
+
 }

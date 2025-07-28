@@ -1,5 +1,7 @@
 package com.hch.chat_simple.pojo.vo;
 
+import java.time.LocalDateTime;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -10,7 +12,7 @@ public class ApplyFriendVO {
 
 
     @Schema(description = "id")
-    private String id;
+    private Long id;
 
     @Schema(description = "申请人id")
     private Long proposerId;
@@ -37,6 +39,12 @@ public class ApplyFriendVO {
     // 申请结果
     @Schema(description = "申请是否通过: 0-拒绝 1-成功")
     private Integer applyPass;
+
+    @Schema(description = "更新时间")
+    private LocalDateTime updatedAt;
+
+    @Schema(description = "更新时间戳，用于前端记录数据更新时间")
+    private Long updateTime;
 
 
 }
