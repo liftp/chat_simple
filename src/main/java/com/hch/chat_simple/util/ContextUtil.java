@@ -8,6 +8,7 @@ public class ContextUtil {
     private static ThreadLocal<String> realNameHolder = new TransmittableThreadLocal<>();
     private static ThreadLocal<Long> userIdHolder = new TransmittableThreadLocal<>();
     private static ThreadLocal<String> newToken = new TransmittableThreadLocal<>();
+    private static ThreadLocal<String> newAccessToken = new TransmittableThreadLocal<>();
 
     public static void setUserId(Long userId) {
         ContextUtil.userIdHolder.set(userId);
@@ -41,11 +42,20 @@ public class ContextUtil {
         newToken.set(token);
     }
 
+    public static String getNewAccessToken() {
+        return newAccessToken.get();
+    }
+
+    public static void setNewAccessToken(String accessToken) {
+        newAccessToken.set(accessToken);
+    }
+
     public static void clear() {
         userIdHolder.set(null);
         usernameHolder.set(null);
         realNameHolder.set(null);
         newToken.set(null);
+        newAccessToken.set(null);
     }
 
 }

@@ -20,6 +20,10 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * WebSocket权限校验处理器
+ * 优先使用AccessToken(Redis)进行校验，兼容旧的token(JWT)方式
+ */
 @Slf4j
 @Sharable
 @Component
@@ -40,19 +44,34 @@ public class PermisionWsHandler extends SimpleChannelInboundHandler<TextWebSocke
             log.info("hv : {}", hv);
             if (StringUtils.isNotBlank(uri)) {
                 MultiValueMap<String, String> map = HttpUrlUtils.getUriParams(uri);
+                // 优先获取accessToken参数
+                String accessToken = map.getFirst("accessToken");
+                // 兼容旧版token参数
                 String token = map.getFirst("token");
                 AttributeKey<WebSocketPerssionVerify> key = AttributeKey.valueOf(Constant.NETTY_CHANNEL_CTX_PERMISSION);
                 WebSocketPerssionVerify verify = ctx.channel().attr(key).get();
                 if (verify == null) {
                     verify = new WebSocketPerssionVerify();
-                    verify.setToken(token);
-                    TokenInfoDTO info = TokenUtil.parseTokenInfo(token);
+                    TokenInfoDTO info = null;
+
+                    // 优先使用AccessToken从Redis获取用户信息
+                    if (StringUtils.isNotBlank(accessToken)) {
+                        verify.setToken(accessToken);
+                        info = TokenUtil.getAccessTokenInfo(accessToken);
+                    }
+                    // 兼容：如果没有accessToken，尝试使用旧版token(JWT)
+                    if (info == null && StringUtils.isNotBlank(token)) {
+                        verify.setToken(token);
+                        info = TokenUtil.parseTokenInfo(token);
+                    }
+
                     if (info != null) {
                         verify.setUserId(info.getUserId());
                         verify.setUsername(info.getUsername());
                         verify.setRealName(info.getRealName());
                     } else {
                         // 校验不通过
+                        log.warn("WebSocket连接校验不通过，accessToken={}, token={}", accessToken, token);
                     }
                 }
 

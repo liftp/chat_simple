@@ -54,6 +54,10 @@ public class RedisUtil implements ApplicationContextAware {
         redisTemplate.opsForValue().set(key, value);
     }
 
+    public static void setWithExpire(String key, String value, long timeout, TimeUnit unit) {
+        redisTemplate.opsForValue().set(key, value, timeout, unit);
+    }
+
     public static long incr(String key) {
         Long result = redisTemplate.opsForValue().increment(key); 
         if (result == null) {
