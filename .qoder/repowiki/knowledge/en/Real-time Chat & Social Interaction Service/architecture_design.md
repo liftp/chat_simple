@@ -1,0 +1,5 @@
+- **Layered Architecture**: Follows a standard Controller-Service-Mapper pattern. Controllers handle HTTP requests, Services manage business logic (including MQ production/consumption), and Mappers interact with MySQL via MyBatis-Plus.
+- **Hybrid Communication**: Uses HTTP REST APIs for state-changing operations (login, friend requests, message persistence) and Netty-based WebSockets for real-time message push and session management.
+- **Asynchronous Messaging**: Integrates Apache RocketMQ to decouple message sending from delivery. Messages are persisted to MySQL first, then published to RocketMQ topics (single-chat, multi-chat) for asynchronous consumption and push to online users via Netty channels.
+- **Session Management**: Maintains active user sessions in a static `NettyGroup` (ChannelGroup + ConcurrentHashMap) mapping User IDs to Netty Channel IDs for direct message routing.
+- **Security & Context**: Implements JWT-based authentication via a `LoginInterceptor` and stores user context in `ThreadLocal` (via `ContextUtil`) for seamless access in service layers.

@@ -1,0 +1,8 @@
+- **Core Framework**: Spring Boot 3.3.6, Java 17.
+- **Persistence**: MyBatis-Plus 3.5.7 with MySQL 5.7.
+- **Messaging**: Apache RocketMQ 5.0.0 (using `rocketmq-spring-boot-starter`).
+- **Real-time**: Netty 4.1.69 for WebSocket handling.
+- **Cache/Distributed Lock**: Redisson 3.23.5 with Redis.
+- **Storage**: MinIO 8.5.2 for file uploads.
+- **Auth**: Auth0 `java-jwt` 4.4.0 for token management.
+- **API Docs**: Knife4j 4.4.0 (OpenAPI 3).

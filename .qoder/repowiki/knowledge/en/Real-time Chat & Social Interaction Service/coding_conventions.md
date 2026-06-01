@@ -1,0 +1,4 @@
+- DTO/PO/VO Separation: Strict separation of data transfer objects (DTO for input), persistent objects (PO extending `BasePO`), and view objects (VO for output), with conversion handled by `BeanConvert`.
+- Enum-based Status Management: Uses enums like `ApplyStatusEnum`, `MsgTypeEnum`, and `YesOrNo` to represent state and types, avoiding magic numbers in business logic.
+- Global Exception Handling: Uses a custom `BusinessException` caught by `ExceptionAspectHandler` to return standardized `Payload` responses with status codes.
+- Context-aware User Identification: User identity is extracted from JWT in the interceptor and stored in `ContextUtil` (ThreadLocal), allowing services to access `userId` without explicit parameter passing.

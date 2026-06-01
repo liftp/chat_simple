@@ -1,0 +1,3 @@
+- **Containerized Deployment**: Uses `docker-compose.yml` to orchestrate the application alongside MySQL, Redis, RocketMQ (Namesrv + Broker), MinIO, and OpenResty (Nginx) for load balancing.
+- **Multi-Instance Tagging**: The application supports horizontal scaling via instance-specific tags (`chat.tag.current` in `application.yml` or `CHAT_TAG_CURRENT` env var). This tag determines which RocketMQ consumer group handles messages for specific users, ensuring ordered delivery per user.
+- **Database Initialization**: The `db/chat.sql` script is automatically mounted and executed by the MySQL container in the Docker setup.

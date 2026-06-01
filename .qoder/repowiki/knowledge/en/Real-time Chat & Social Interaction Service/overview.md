@@ -1,0 +1,1 @@
+A Spring Boot application providing real-time messaging, friend management, and group chat capabilities using WebSocket, Netty, and RocketMQ for asynchronous message distribution.
