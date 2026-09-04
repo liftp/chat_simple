@@ -22,6 +22,8 @@ services:
       - CHAT_TAG_CURRENT=chat_a
       - MINIO_URL=http://minio:9000/
       - ROCKETMQ_NAME-SERVER=namesrv:9876
+      - CALL_TURN_URLS=turn:coturn:3478
+      - CALL_TURN_SECRET=chat-turn-secret
     depends_on:
       - db
       - redis
@@ -39,6 +41,8 @@ services:
       - CHAT_TAG_CURRENT=chat_b
       - MINIO_URL=http://minio:9000/
       - ROCKETMQ_NAME-SERVER=namesrv:9876
+      - CALL_TURN_URLS=turn:coturn:3478
+      - CALL_TURN_SECRET=chat-turn-secret
     depends_on:
       - db
       - redis
@@ -56,6 +60,8 @@ services:
       - CHAT_TAG_CURRENT=chat_c
       - MINIO_URL=http://minio:9000/
       - ROCKETMQ_NAME-SERVER=namesrv:9876
+      - CALL_TURN_URLS=turn:coturn:3478
+      - CALL_TURN_SECRET=chat-turn-secret
     depends_on:
       - db
       - redis
@@ -125,6 +131,21 @@ services:
       /usr/bin/mc anonymous set download myminio/chat;
       exit 0;
       "
+  coturn:
+    # WebRTC 语音中继，host 网络模式下无需为中继端口做映射
+    image: coturn/coturn
+    network_mode: "host"
+    pid: host
+    restart: always
+    command: >
+      --listening-port=3478
+      --use-auth-secret
+      --static-auth-secret=chat-turn-secret
+      --realm=chat
+      --min-port=49160
+      --max-port=49200
+      --no-tls
+      --no-dtls
 
 volumes:
   redis-data: 

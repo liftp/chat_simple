@@ -81,6 +81,13 @@ chat:
     local: true 
     current: chat_a # 这个配置为了找chat.tag.list中的位置设置为tag,用来取模mq tag
 
+# 语音通话 TURN(coturn)，为空退化为内网直连；容器部署用 CALL_TURN_URLS / CALL_TURN_SECRET 覆盖
+call:
+  turn:
+    urls:
+    secret:
+    ttl: 3600
+
 minio:
   accessKey: minio
   secretKey: minio123

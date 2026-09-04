@@ -52,7 +52,7 @@ public class ChatMsgDTO {
     @Schema(description = "群聊接收人")
     private List<Long> groupToUserIds;
 
-    @Schema(description = "消息内容类型 1: 文本 2: 语音")
+    @Schema(description = "消息内容类型 1: 文本 2: 语音 3: 通话")
     private Integer contentType;
 
     @Schema(description = "内容长度")
