@@ -54,7 +54,7 @@
 
 ```shell
 # 先编译项目, 前置需要了jdk17 maven环境,再项目根目录下
-maven install -DskipTests
+mvn install -DskipTests
 # 使用Dockerfile构建
 docker build -t chat/chat_simple:1.0.0 .
 # 注意项目下的openresty_nginx_conf/nginx.conf, 修改ws代理路径为，docker宿主容器的ip，这样就可以直接运行docker compose
