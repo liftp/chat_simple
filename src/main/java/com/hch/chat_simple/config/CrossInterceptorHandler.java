@@ -20,7 +20,7 @@ public class CrossInterceptorHandler implements HandlerInterceptor {
         // 预检请求的缓存时间
         response.setHeader("Access-Control-Max-Age", "3600");
         // 允许的请求头
-        response.setHeader("Access-Control-Allow-Headers", "x-requested-with,accept,authorization,content-type");
+        response.setHeader("Access-Control-Allow-Headers", "x-requested-with,accept,authorization,content-type,accesstoken,refreshtoken");
         return true;
     }
     
