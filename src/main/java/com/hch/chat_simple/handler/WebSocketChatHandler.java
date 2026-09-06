@@ -134,13 +134,18 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
                     return;
                 }
 
-                TokenInfoDTO info =  TokenUtil.parseTokenInfo(token);
-                if (info == null) {
-                    // token 失效处理
-                    return;
+                // 握手阶段 PermisionWsHandler 已用 Redis accessToken 校验并填充 userId（新版 token 机制）。
+                // Redis UUID 不是 JWT，直接走旧版 parseTokenInfo 会解码失败（JWTDecodeException），
+                // 导致 channel 不注册进 channelMap、用户收不到推送；仅当 verify 未带 userId（旧版 JWT token）时才兜底解析
+                if (verify.getUserId() == null) {
+                    TokenInfoDTO info =  TokenUtil.parseTokenInfo(token);
+                    if (info == null) {
+                        // token 失效处理
+                        return;
+                    }
+                    verify.setUserId(info.getUserId());
+                    ctx.channel().attr(key).setIfAbsent(verify);
                 }
-                verify.setUserId(info.getUserId());
-                ctx.channel().attr(key).setIfAbsent(verify);
 
                 Channel channel = ctx.channel();
                 // 添加到channelMap中，便于发送消息
