@@ -89,8 +89,6 @@ services:
     container_name: rmqnamesrv
     ports:
       - 9876:9876
-    networks:
-      - rocketmq_net
     command: sh mqnamesrv
   broker:
     image: apache/rocketmq:5.0.0
@@ -101,8 +99,6 @@ services:
       NAMESRV_ADDR: namesrv:9876
     depends_on:
       - namesrv
-    networks:
-      - rocketmq_net
     command: sh mqbroker -n namesrv:9876 
   rmqdashboard:
     image: apacherocketmq/rocketmq-dashboard:latest
@@ -114,8 +110,6 @@ services:
       JAVA_OPTS: "-Drocketmq.namesrv.addr=namesrv:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false"
     depends_on:
       - namesrv
-    networks:
-      - rocketmq_net
     restart: always
   minio:
     image: minio/minio
@@ -167,8 +161,5 @@ services:
 volumes:
   redis-data: 
 
-networks:
-  rocketmq_net:
-    driver: bridge
 
     
