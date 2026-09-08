@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.hch.chat_simple.config.NettyGroup;
 import com.hch.chat_simple.enums.MsgTypeEnum;
 import com.hch.chat_simple.mq.AsyncProducer;
@@ -22,6 +21,7 @@ import com.hch.chat_simple.pojo.dto.WebSocketPerssionVerify;
 import com.hch.chat_simple.pojo.po.ChatMsgPO;
 import com.hch.chat_simple.service.IChatMsgService;
 import com.hch.chat_simple.util.BeanConvert;
+import com.hch.chat_simple.util.InstanceMapTagUtils;
 import com.hch.chat_simple.util.Constant;
 import com.hch.chat_simple.util.SnowflakeIdGen;
 import com.hch.chat_simple.util.TokenUtil;
@@ -175,7 +175,9 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
     }
 
     /**
-     * 语音通话信令转发：content 是前端约定的信令json，服务端只负责找人并覆写真实发送人
+     * 通话信令转发：content 是前端约定的信令json，服务端只覆写真实发送人后投递。
+     * ws 按 userId 哈希分散在多个实例上，主叫所在实例的 channelMap 里没有对端 channel，
+     * 所以和单聊消息一样按对端 userId 算 tag 投 MQ，由对端所在实例消费下发（见 AsyncConsumerSingleChat）
      */
     private void forwardSignal(ChannelHandlerContext ctx, ChatMsgDTO msgObj) {
         WebSocketPerssionVerify verify = getUserInfo(ctx);
@@ -186,29 +188,8 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
         }
         // 不信任客户端上报的发送人
         msgObj.setSendUserId(from);
-
-        ChannelId targetId = channelMap.get(to);
-        Channel target = targetId == null ? null : channelGroup.find(targetId);
-        if (target != null) {
-            target.writeAndFlush(new TextWebSocketFrame(MsgTypeEnum.VOICE_SIGNAL.getType() + "," + JSON.toJSONString(msgObj)));
-            return;
-        }
-
-        // 对端不在线，回执给发起方
-        String callId = null;
-        try {
-            callId = JSON.parseObject(msgObj.getContent()).getString("callId");
-        } catch (Exception e) {
-            log.warn("信令content格式异常: {}", msgObj.getContent());
-        }
-        JSONObject offline = new JSONObject();
-        offline.put("callId", callId);
-        offline.put("type", "offline");
-        ChatMsgDTO back = BeanConvert.convertSingle(msgObj, ChatMsgDTO.class);
-        back.setSendUserId(to);
-        back.setReceiveUserId(from);
-        back.setContent(offline.toJSONString());
-        ctx.writeAndFlush(new TextWebSocketFrame(MsgTypeEnum.VOICE_SIGNAL.getType() + "," + JSON.toJSONString(back)));
+        asyncProducerMuiltChat.asyncSend(singleChatTopic,
+            InstanceMapTagUtils.singleIdMapTag(to) + "", JSON.toJSONString(msgObj));
     }
 
     private void removeChannelId(ChannelHandlerContext ctx) {
