@@ -34,6 +34,7 @@ CREATE TABLE friend_relationship (
 ) COMMENT '朋友关系表';
 
 
+
 CREATE TABLE chat_msg (  
     id bigint NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
     
@@ -41,7 +42,7 @@ CREATE TABLE chat_msg (
     chat_type TINYINT(1) COMMENT '聊天类型 0:单聊 1:群聊',
     send_user_id BIGINT COMMENT '发送人',
     receive_user_id BIGINT COMMENT '接收人，群聊时为空',
-    `content` VARCHAR(1000) COMMENT '消息内容',
+    `content` TEXT COMMENT '消息内容',
     group_id BIGINT COMMENT '群聊id',
     `status` TINYINT(1) COMMENT '群聊消息发送状态 0:失败 1:成功',
     created_at DATETIME(3) COMMENT '创建时间',
