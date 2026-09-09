@@ -18,6 +18,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
 import jakarta.annotation.PostConstruct;
@@ -82,6 +83,9 @@ public class ChatComponentConfig {
                 pipeline.addLast(permisionWsHandler);
 
                 pipeline.addLast(new WebSocketServerProtocolHandler("/chat", WS_PROTOCOL, true, 65536 * 10));
+                // WebSocket 分片聚合：客户端发送超长消息时会被拆分为多个 continuation frame，
+                // 此处聚合为完整 frame，避免业务层收到半包导致解析失败（接收方向拆包处理）
+                pipeline.addLast(new WebSocketFrameAggregator(65536 * 10));
                 // 业务handler
                 pipeline.addLast(webSocketSingleChatHandler);
             }

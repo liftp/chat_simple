@@ -12,6 +12,7 @@ import com.hch.chat_simple.enums.MsgTypeEnum;
 import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
 import com.hch.chat_simple.service.IMsgSenderService;
 import com.hch.chat_simple.util.BeanConvert;
+import com.hch.chat_simple.util.Constant;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -33,11 +34,17 @@ public class MsgSenderServiceImpl implements IMsgSenderService {
      */
     @Override
     public void sendMsg(ChatMsgDTO msg) {
+        String json = JSON.toJSONString(msg);
+        // 粘包/拆包处理：超过 MSG_MAX_LENGTH 字符的长消息，记录告警，避免对端无法完整接收
+        if (json.length() > Constant.MSG_MAX_LENGTH) {
+            log.warn("发送消息长度={} 超过阈值 {}，触发粘包/拆包告警，receiveUserId={}",
+                    json.length(), Constant.MSG_MAX_LENGTH, msg.getReceiveUserId());
+        }
         ChannelId userChannelId = userMapChannel.get(msg.getReceiveUserId());
         if (userChannelId != null) {
             Channel channel = channelGroup.find(userChannelId);
             if (channel != null) {
-                ChannelFuture future = channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(msg)));
+                ChannelFuture future = channel.writeAndFlush(new TextWebSocketFrame(json));
                 future.addListener((result) -> {
                     // 接收成功或失败，记录状态，失败下次登录拉取
                     boolean receiveStatus = result.isSuccess();

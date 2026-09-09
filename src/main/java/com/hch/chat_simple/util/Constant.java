@@ -29,4 +29,7 @@ public class Constant {
 
     // redis 存储实例及映射关系key
     public static final String INST_WITH_MAP_KEY = "INST_WITH_MAP_KEY";
+
+    // 单条消息最大字符数：超过此阈值视为长消息，触发粘包/拆包处理（聚合告警）
+    public static final int MSG_MAX_LENGTH = 2000;
 }

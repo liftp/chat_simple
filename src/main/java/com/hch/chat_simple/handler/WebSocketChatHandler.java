@@ -74,6 +74,11 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
 
         log.info("server receive msg:{}", msg.text());
+        // 粘包/拆包处理：超过 MSG_MAX_LENGTH 字符的消息记录告警，便于定位长消息/分片异常
+        if (msg.text() != null && msg.text().length() > Constant.MSG_MAX_LENGTH) {
+            log.warn("接收消息长度={} 超过阈值 {}，触发粘包/拆包告警，channelId={}",
+                    msg.text().length(), Constant.MSG_MAX_LENGTH, ctx.channel().id().asLongText());
+        }
         // msg是json结构，需要提取发送人
         ChatMsgDTO msgObj = JSON.parseObject(msg.text(), ChatMsgDTO.class);
 
