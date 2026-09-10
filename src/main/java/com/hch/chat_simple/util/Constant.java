@@ -32,4 +32,7 @@ public class Constant {
 
     // 单条消息最大字符数：超过此阈值视为长消息，触发粘包/拆包处理（聚合告警）
     public static final int MSG_MAX_LENGTH = 2000;
+
+    // 用户在线状态 redis key 前缀，完整 key: user_status:{userId}
+    public static final String USER_STATUS_PREFIX = "user_status:";
 }

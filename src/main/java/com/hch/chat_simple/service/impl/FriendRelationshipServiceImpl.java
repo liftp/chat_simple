@@ -5,7 +5,8 @@ import com.hch.chat_simple.pojo.po.FriendRelationshipPO;
 import com.hch.chat_simple.pojo.po.UserPO;
 import com.hch.chat_simple.pojo.query.FriendRelationshipQuery;
 import com.hch.chat_simple.pojo.vo.FriendRelationshipVO;
-import com.hch.chat_simple.config.NettyGroup;
+import com.hch.chat_simple.util.RedisUtil;
+import com.hch.chat_simple.util.Constant;
 import com.hch.chat_simple.exception.BusinessException;
 import com.hch.chat_simple.mapper.FriendRelationshipMapper;
 import com.hch.chat_simple.service.IFriendRelationshipService;
@@ -21,7 +22,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,10 +54,9 @@ public class FriendRelationshipServiceImpl extends ServiceImpl<FriendRelationshi
             .eq(FriendRelationshipPO::getSelfId, userId);
         List<FriendRelationshipPO> poList = list(queryFriends);
         List<FriendRelationshipVO> voList = BeanConvert.convert(poList, FriendRelationshipVO.class);
-        // 查询在线状态：好友id 存在于 channelMap 即在线
-        Map<Long, ?> channelMap = NettyGroup.getUserMapChannel();
+        // 从 Redis 查询在线状态，多实例共享
         if (voList != null) {
-            voList.forEach(vo -> vo.setOnline(channelMap.containsKey(vo.getFriendId())));
+            voList.forEach(vo -> vo.setOnline(RedisUtil.hasKey(Constant.USER_STATUS_PREFIX + vo.getFriendId())));
         }
         return voList;
     }

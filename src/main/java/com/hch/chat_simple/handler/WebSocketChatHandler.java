@@ -20,6 +20,7 @@ import com.hch.chat_simple.mq.AsyncProducer;
 import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
 import com.hch.chat_simple.pojo.dto.TokenInfoDTO;
 import com.hch.chat_simple.pojo.dto.OnlineStatusDTO;
+import com.hch.chat_simple.util.RedisUtil;
 import com.hch.chat_simple.pojo.dto.WebSocketPerssionVerify;
 import com.hch.chat_simple.pojo.po.ChatMsgPO;
 import com.hch.chat_simple.pojo.po.FriendRelationshipPO;
@@ -175,6 +176,8 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
                     // 加入channel
                     channelMap.put(userId, channel.id());
                     channelGroup.add(channel);
+                    // 写入 Redis 在线状态，多实例共享
+                    RedisUtil.set(Constant.USER_STATUS_PREFIX + userId, "1");
                     // 通知好友上线
                     notifyFriendsStatus(userId, username, MsgTypeEnum.UP_LINE);
                 }
@@ -254,6 +257,8 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
         Long userId = getUserId(ctx);
         // 缓存移除
         if (userId != null) {
+            // 删除 Redis 在线状态
+            RedisUtil.delete(Constant.USER_STATUS_PREFIX + userId);
             ChannelId channelId = channelMap.remove(userId);
             Channel ch = channelGroup.find(channelId);
             if (ch != null) {
