@@ -2,9 +2,11 @@ package com.hch.chat_simple.handler;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +19,13 @@ import com.hch.chat_simple.enums.MsgTypeEnum;
 import com.hch.chat_simple.mq.AsyncProducer;
 import com.hch.chat_simple.pojo.dto.ChatMsgDTO;
 import com.hch.chat_simple.pojo.dto.TokenInfoDTO;
+import com.hch.chat_simple.pojo.dto.OnlineStatusDTO;
 import com.hch.chat_simple.pojo.dto.WebSocketPerssionVerify;
 import com.hch.chat_simple.pojo.po.ChatMsgPO;
+import com.hch.chat_simple.pojo.po.FriendRelationshipPO;
 import com.hch.chat_simple.service.IChatMsgService;
+import com.hch.chat_simple.service.IFriendRelationshipService;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.hch.chat_simple.util.BeanConvert;
 import com.hch.chat_simple.util.InstanceMapTagUtils;
 import com.hch.chat_simple.util.Constant;
@@ -61,8 +67,14 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
     @Value("${mq.topic.single-chat}")
     private String singleChatTopic;
 
+    @Value("${mq.topic.composition}")
+    private String compositionTopic;
+
     @Resource
     private IChatMsgService iChatMsgService;
+
+    @Autowired
+    private IFriendRelationshipService friendRelationshipService;
 
     // @Resource
     // private SnowflakeIdGen snowflakeIdGen;
@@ -163,20 +175,33 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
                     // 加入channel
                     channelMap.put(userId, channel.id());
                     channelGroup.add(channel);
+                    // 通知好友上线
+                    notifyFriendsStatus(userId, username, MsgTypeEnum.UP_LINE);
                 }
             } else {
                 // TODO 发送未登录消息
                 return;
             }
-
-            if (evt instanceof IdleStateEvent) {
-                IdleStateEvent event = (IdleStateEvent) evt;
-                if (event.state() == IdleState.ALL_IDLE) {
-                    // Channel channel = ctx.channel();
-                    removeChannelId(ctx);
-                }
+        }
+        // 修复：IdleStateEvent 移到 HandshakeComplete 外层，原来嵌套在内部永远不会触发
+        if (evt instanceof IdleStateEvent) {
+            IdleStateEvent event = (IdleStateEvent) evt;
+            if (event.state() == IdleState.ALL_IDLE) {
+                removeChannelId(ctx);
+                ctx.close();
             }
         }
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        // 连接断开，通知好友下线
+        WebSocketPerssionVerify verify = getUserInfo(ctx);
+        if (verify != null && verify.getUserId() != null) {
+            removeChannelId(ctx);
+            notifyFriendsStatus(verify.getUserId(), verify.getUsername(), MsgTypeEnum.DOWN_LINE);
+        }
+        super.channelInactive(ctx);
     }
 
     /**
@@ -195,6 +220,34 @@ public class WebSocketChatHandler extends SimpleChannelInboundHandler<TextWebSoc
         msgObj.setSendUserId(from);
         asyncProducerMuiltChat.asyncSend(singleChatTopic,
             InstanceMapTagUtils.singleIdMapTag(to) + "", JSON.toJSONString(msgObj));
+    }
+
+    /**
+     * 通知好友在线状态变更：查询当前用户的好友列表，通过 composition topic 按好友 id 算 tag 投递消息，
+     * 由好友所在实例消费并推送 ws
+     */
+    private void notifyFriendsStatus(Long userId, String username, MsgTypeEnum msgType) {
+        try {
+            List<FriendRelationshipPO> friends = friendRelationshipService.list(
+                Wrappers.<FriendRelationshipPO>query().lambda()
+                    .eq(FriendRelationshipPO::getSelfId, userId)
+            );
+            if (friends == null || friends.isEmpty()) {
+                return;
+            }
+            OnlineStatusDTO statusDTO = new OnlineStatusDTO();
+            statusDTO.setUserId(userId);
+            statusDTO.setUsername(username);
+            String body = JSON.toJSONString(statusDTO);
+            for (FriendRelationshipPO friend : friends) {
+                Long friendId = friend.getFriendId();
+                int tag = InstanceMapTagUtils.singleIdMapTag(friendId);
+                String msg = msgType.getType() + "," + friendId + "," + body;
+                asyncProducerMuiltChat.asyncSend(compositionTopic, tag + "", msg);
+            }
+        } catch (Exception e) {
+            log.error("通知好友在线状态异常, userId={}, msgType={}", userId, msgType, e);
+        }
     }
 
     private void removeChannelId(ChannelHandlerContext ctx) {

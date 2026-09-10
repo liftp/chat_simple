@@ -21,11 +21,13 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.stream.ChunkedWriteHandler;
+import io.netty.handler.timeout.IdleStateHandler;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Configuration
@@ -86,6 +88,8 @@ public class ChatComponentConfig {
                 // WebSocket 分片聚合：客户端发送超长消息时会被拆分为多个 continuation frame，
                 // 此处聚合为完整 frame，避免业务层收到半包导致解析失败（接收方向拆包处理）
                 pipeline.addLast(new WebSocketFrameAggregator(65536 * 10));
+                // 空闲检测：60s 无读写则触发 IdleStateEvent，用于下线通知
+                pipeline.addLast(new IdleStateHandler(60, 60, 0, TimeUnit.SECONDS));
                 // 业务handler
                 pipeline.addLast(webSocketSingleChatHandler);
             }
