@@ -8,6 +8,7 @@ CREATE TABLE user (
     username VARCHAR(64) COMMENT '用户名',
     password VARCHAR(64) COMMENT '密码',
     name VARCHAR(64) COMMENT '真实姓名',
+    avatar VARCHAR(255) COMMENT '头像URL',
     created_at DATETIME COMMENT '创建时间',
     creator_id BIGINT COMMENT '创建人id',
     creator_by VARCHAR(64) COMMENT '创建人姓名',
@@ -125,3 +126,6 @@ CREATE TABLE `notify_msg`  (
 
     PRIMARY KEY (`id`)
 ) COMMENT = '通知类型消息';
+
+-- 增量迁移：用户表增加头像字段
+ALTER TABLE user ADD COLUMN avatar VARCHAR(255) COMMENT '头像URL' AFTER name;

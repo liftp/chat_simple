@@ -40,6 +40,9 @@ public class UserPO extends BasePO {
     //@Schema(description = "真实姓名")
     private String name;
 
+    //@Schema(description = "头像URL")
+    private String avatar;
+
     //@Schema(description = "生日年月")
     // private LocalDateTime birthday;
 

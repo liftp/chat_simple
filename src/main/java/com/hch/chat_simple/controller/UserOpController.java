@@ -31,6 +31,7 @@ import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.Data;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -138,6 +139,16 @@ public class UserOpController {
         return Payload.success(vo);
     }
 
+    @PostMapping("/updateUserInfo")
+    @Operation(summary = "修改用户信息(姓名+头像)")
+    public Payload<UserVO> updateUserInfo(@RequestBody UpdateUserForm form) {
+        Long userId = ContextUtil.getUserId();
+        iUserService.updateUserInfo(userId, form.getName(), form.getAvatar());
+        UserPO po = iUserService.getById(userId);
+        UserVO vo = BeanConvert.convertSingle(po, UserVO.class);
+        return Payload.success(vo);
+    }
+
     @PostMapping("test")
     @Operation(description = "测试权限")
     public Payload<String> getHasAuth() {
@@ -166,6 +177,12 @@ public class UserOpController {
     @Operation(description = "添加用户")
     public Payload<Boolean> insertUser(@Valid @RequestBody AddUserForm form) {
         return Payload.success(iUserService.insertUser(form));
+    }
+
+    @Data
+    public static class UpdateUserForm {
+        private String name;
+        private String avatar;
     }
 
 }

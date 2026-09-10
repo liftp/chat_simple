@@ -96,4 +96,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserPO> implements 
         return true;
     }
 
+    @Override
+    public Boolean updateUserInfo(Long userId, String name, String avatar) {
+        UserPO po = this.getById(userId);
+        if (po == null) {
+            throw new RuntimeException("用户不存在");
+        }
+        if (name != null) {
+            po.setName(name);
+        }
+        if (avatar != null) {
+            po.setAvatar(avatar);
+        }
+        this.updateById(po);
+        return true;
+    }
+
 }

@@ -24,4 +24,9 @@ public interface IUserService extends IService<UserPO> {
 
     Boolean insertUser(AddUserForm form);
 
+    /**
+     * 修改用户信息(姓名+头像)
+     */
+    Boolean updateUserInfo(Long userId, String name, String avatar);
+
 }
