@@ -49,4 +49,7 @@ public class FriendRelationshipVO {
 
     @Schema(description = "创建人id")
     private Long creatorId;
+
+    @Schema(description = "在线状态 true:在线 false:离线")
+    private Boolean online;
 }
